@@ -63,7 +63,7 @@ class CrmService
         // Instantiate the Template processor
         $templateProcessor = new MsWordTemplateProcessor($tplSRC, $target);
 
-        $templateProcessor->replace('invoiceAddress', static::formatMultilineText($objCustomer->invoiceAddress));
+        $templateProcessor->replace('invoiceAddress', $objCustomer->invoiceAddress, array('multiline' => true));
         $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
         $templateProcessor->replace('ustId', $ustNumber);
         $templateProcessor->replace('invoiceDate', Date::parse('d.m.Y', $objInvoice->invoiceDate));
@@ -96,12 +96,12 @@ class CrmService
             $i = $key + 1;
             $quantityTotal += $arrService['quantity'];
             $templateProcessor->createClone('a');
-            $templateProcessor->addToClone('a', 'a', htmlspecialchars(utf8_decode_entities($i)), array('multiline' => false));
-            $templateProcessor->addToClone('a', 'b', htmlspecialchars(utf8_decode_entities($arrService['item'])), array('multiline' => true));
+            $templateProcessor->addToClone('a', 'a', static::prepareString($i), array('multiline' => false));
+            $templateProcessor->addToClone('a', 'b', static::prepareString($arrService['item']), array('multiline' => true));
             $templateProcessor->addToClone('a', 'c', $arrService['quantity'], array('multiline' => false));
-            $templateProcessor->addToClone('a', 'd', htmlspecialchars(utf8_decode_entities($objInvoice->currency)), array('multiline' => false));
-            $templateProcessor->addToClone('a', 'e', htmlspecialchars(utf8_decode_entities($arrService['price'])), array('multiline' => false));
- 
+            $templateProcessor->addToClone('a', 'd', static::prepareString($objInvoice->currency), array('multiline' => false));
+            $templateProcessor->addToClone('a', 'e', static::prepareString($arrService['price']), array('multiline' => false));
+
         }
         $templateProcessor->replace('f', $quantityTotal);
         $templateProcessor->replace('g', $objInvoice->currency);
@@ -131,16 +131,19 @@ class CrmService
         }
     }
 
-    /**
-     * @param $text
-     * @return mixed|string
-     */
-    protected static function formatMultilineText($text)
-    {
 
-        $text = htmlspecialchars(utf8_decode_entities($text));
-        $text = preg_replace('~\R~u', '</w:t><w:br/><w:t>', $text);
-        return $text;
+    /**
+     * @param string $string
+     * @return string
+     */
+    protected static function prepareString(string $string = ''): string
+    {
+        if (empty($string))
+        {
+            return '';
+        }
+
+        return utf8_decode_entities(htmlspecialchars(html_entity_decode((string) $string)));
     }
 
     /**
