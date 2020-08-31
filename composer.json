@@ -1,0 +1,55 @@
+{
+  "name": "markocupic/contao-crm-bundle",
+  "description": "Mini CRM for private usage",
+  "keywords": [
+    "contao",
+    "bundle",
+    "tag 1",
+    "tag 2"
+  ],
+  "type": "contao-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marko Cupic",
+      "email": "m.cupic@gmx.ch",
+      "homepage": "https://github.com/markocupic/contao-crm-bundle",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/markocupic/contao-crm-bundle/issues",
+    "source": "https://github.com/markocupic/contao-crm-bundle"
+  },
+  "require": {
+    "contao/core-bundle": "^4.9",
+    "cloudconvert/cloudconvert-php": "2.2.*",
+    "phpoffice/phpword": "^0.17"
+  },
+  "require-dev": {
+    "contao/test-case": "^4.0",
+    "contao/php-cs-fixer": "^2.2",
+    "contao/manager-plugin": "^2.3",
+    "phpunit/phpunit": "^8.4",
+    "symfony/http-client": "4.4.*",
+    "symfony/phpunit-bridge": "4.4.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Markocupic\\ContaoCrmBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/config",
+      "src/Resources/contao/dca",
+      "src/Resources/contao/languages",
+      "src/Resources/contao/templates"
+    ]
+  },
+  "extra": {
+    "contao-manager-plugin": "Markocupic\\ContaoCrmBundle\\ContaoManager\\Plugin"
+  }
+
+}
