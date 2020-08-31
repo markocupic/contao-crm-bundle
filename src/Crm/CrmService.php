@@ -21,6 +21,7 @@ use Contao\Validator;
 use Contao\FilesModel;
 use Contao\Date;
 use Contao\Database;
+use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 
 /**
  * Class CrmService
@@ -54,14 +55,19 @@ class CrmService
             }
         }
 
-        // Instantiate the Template processor
-        $templateProcessor = new TemplateProcessorExtended(TL_ROOT . '/' . $tplSRC);
 
-        $templateProcessor->setValue('invoiceAddress', static::formatMultilineText($objCustomer->invoiceAddress));
+        $type = $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1];
+        $filename = $type . '_' . Date::parse('Ymd', $objInvoice->invoiceDate) . '_' . '_' . str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT) . '_' . str_replace(' ', '-', $objCustomer->company) . '.docx';
+        $target = 'system/tmp/' . $filename;
+
+        // Instantiate the Template processor
+        $templateProcessor = new MsWordTemplateProcessor($tplSRC, $target);
+
+        $templateProcessor->replace('invoiceAddress', static::formatMultilineText($objCustomer->invoiceAddress));
         $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
-        $templateProcessor->setValue('ustId', $ustNumber);
-        $templateProcessor->setValue('invoiceDate', Date::parse('d.m.Y', $objInvoice->invoiceDate));
-        $templateProcessor->setValue('projectId', $GLOBALS["TL_LANG"]["MSC"]["projectId"] . ': ' . str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT));
+        $templateProcessor->replace('ustId', $ustNumber);
+        $templateProcessor->replace('invoiceDate', Date::parse('d.m.Y', $objInvoice->invoiceDate));
+        $templateProcessor->replace('projectId', $GLOBALS["TL_LANG"]["MSC"]["projectId"] . ': ' . str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT));
 
         if ($objInvoice->invoiceType == 'invoiceDelivered')
         {
@@ -72,14 +78,14 @@ class CrmService
             $invoiceNumber = '';
         }
         // Invoice Number
-        $templateProcessor->setValue('invoiceNumber', $invoiceNumber);
+        $templateProcessor->replace('invoiceNumber', $invoiceNumber);
 
         // Invoice type
-        $templateProcessor->setValue('invoiceType', strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1]));
+        $templateProcessor->replace('invoiceType', strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1]));
 
         // Customer ID
         $customerId = $GLOBALS["TL_LANG"]["MSC"]["customerId"] . ': ' . str_pad($objCustomer->id, 7, 0, STR_PAD_LEFT);
-        $templateProcessor->setValue('customerId', $customerId);
+        $templateProcessor->replace('customerId', $customerId);
 
         // Invoice table
         $arrServices = deserialize($objInvoice->servicePositions, true);
@@ -89,29 +95,31 @@ class CrmService
         {
             $i = $key + 1;
             $quantityTotal += $arrService['quantity'];
-            $templateProcessor->setValue('a#' . $i, htmlspecialchars(utf8_decode_entities($i)));
-            $templateProcessor->setValue('b#' . $i, static::formatMultilineText($arrService['item']));
-            $templateProcessor->setValue('c#' . $i, $arrService['quantity']);
-            $templateProcessor->setValue('d#' . $i, htmlspecialchars(utf8_decode_entities($objInvoice->currency)));
-            $templateProcessor->setValue('e#' . $i, htmlspecialchars(utf8_decode_entities($arrService['price'])));
+            $templateProcessor->createClone('a');
+            $templateProcessor->addToClone('a', 'a', htmlspecialchars(utf8_decode_entities($i)), array('multiline' => false));
+            $templateProcessor->addToClone('a', 'b', htmlspecialchars(utf8_decode_entities($arrService['item'])), array('multiline' => true));
+            $templateProcessor->addToClone('a', 'c', $arrService['quantity'], array('multiline' => false));
+            $templateProcessor->addToClone('a', 'd', htmlspecialchars(utf8_decode_entities($objInvoice->currency)), array('multiline' => false));
+            $templateProcessor->addToClone('a', 'e', htmlspecialchars(utf8_decode_entities($arrService['price'])), array('multiline' => false));
+ 
         }
-        $templateProcessor->setValue('f', $quantityTotal);
-        $templateProcessor->setValue('g', $objInvoice->currency);
-        $templateProcessor->setValue('h', $objInvoice->price);
+        $templateProcessor->replace('f', $quantityTotal);
+        $templateProcessor->replace('g', $objInvoice->currency);
+        $templateProcessor->replace('h', $objInvoice->price);
         // End table
 
         if ($objInvoice->alternativeInvoiceText != '')
         {
-            $templateProcessor->setValue('INVOICE_TEXT', static::formatMultilineText($objInvoice->alternativeInvoiceText));
+            $templateProcessor->replace('INVOICE_TEXT', static::formatMultilineText($objInvoice->alternativeInvoiceText));
         }
         else
         {
-            $templateProcessor->setValue('INVOICE_TEXT', static::formatMultilineText($objInvoice->defaultInvoiceText));
+            $templateProcessor->replace('INVOICE_TEXT', static::formatMultilineText($objInvoice->defaultInvoiceText));
         }
 
         $type = $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1];
         $filename = $type . '_' . Date::parse('Ymd', $objInvoice->invoiceDate) . '_' . '_' . str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT) . '_' . str_replace(' ', '-', $objCustomer->company) . '.docx';
-        $templateProcessor->saveAs(TL_ROOT . '/files/Rechnungen/' . $filename);
+        $templateProcessor->saveAs(TL_ROOT . '/' . $target);
         sleep(2);
         if ($format == 'pdf')
         {
