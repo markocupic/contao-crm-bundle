@@ -110,11 +110,11 @@ class CrmService
 
         if ($objInvoice->alternativeInvoiceText != '')
         {
-            $templateProcessor->replace('INVOICE_TEXT', static::formatMultilineText($objInvoice->alternativeInvoiceText));
+            $templateProcessor->replace('INVOICE_TEXT', $objInvoice->alternativeInvoiceText,array('multiline' => true));
         }
         else
         {
-            $templateProcessor->replace('INVOICE_TEXT', static::formatMultilineText($objInvoice->defaultInvoiceText));
+            $templateProcessor->replace('INVOICE_TEXT', $objInvoice->defaultInvoiceText, array('multiline' => true));
         }
 
         $type = $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1];
