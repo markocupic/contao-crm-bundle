@@ -4,6 +4,7 @@
  * This file is part of a markocupic Contao Bundle.
  *
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
  * @author     Marko Cupic
  * @package    Contao CRM Bundle
  * @license    MIT
@@ -31,15 +32,16 @@ class CrmService
 
     /**
      * Generate the invoice from a docx template
+     *
      * @param $id
      * @param string $format
      */
     public static function generateInvoice($id, $format = 'docx')
     {
+
         // Load the invoice and customer data
         $objInvoice = Database::getInstance()->prepare('SELECT * FROM tl_crm_service WHERE id=?')->execute($id);
         $objCustomer = Database::getInstance()->prepare('SELECT * FROM tl_crm_customer WHERE id=?')->execute($objInvoice->toCustomer);
-
 
         // Get the template path
         $tplSRC = 'vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates/crm_invoice_template_default.docx';
@@ -54,7 +56,6 @@ class CrmService
 
         // Instantiate the Template processor
         $templateProcessor = new TemplateProcessorExtended(TL_ROOT . '/' . $tplSRC);
-
 
         $templateProcessor->setValue('invoiceAddress', static::formatMultilineText($objCustomer->invoiceAddress));
         $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
@@ -115,13 +116,11 @@ class CrmService
         if ($format == 'pdf')
         {
             static::sendPdfToBrowser('files/Rechnungen/' . $filename);
-
         }
         else
         {
             Controller::sendFileToBrowser('files/Rechnungen/' . $filename);
         }
-
     }
 
     /**
@@ -130,6 +129,7 @@ class CrmService
      */
     protected static function formatMultilineText($text)
     {
+
         $text = htmlspecialchars(utf8_decode_entities($text));
         $text = preg_replace('~\R~u', '</w:t><w:br/><w:t>', $text);
         return $text;
@@ -137,10 +137,12 @@ class CrmService
 
     /**
      * Convert docx to pdf
+     *
      * @param $docxSRC
      */
     protected static function sendPdfToBrowser($docxSRC)
     {
+
         if (!isset($GLOBALS['TL_CONFIG']['clodConvertApiKey']))
         {
             new Exception('No API Key defined for the Cloud Convert Service. https://cloudconvert.com/api');
@@ -156,15 +158,13 @@ class CrmService
         $api = new Api($key);
         try
         {
-
             $api->convert([
-                'inputformat' => 'docx',
+                'inputformat'  => 'docx',
                 'outputformat' => 'pdf',
-                'input' => 'upload',
-                'file' => fopen(TL_ROOT . '/' . $docxSRC, 'r'),
+                'input'        => 'upload',
+                'file'         => fopen(TL_ROOT . '/' . $docxSRC, 'r'),
             ])->wait()->download(TL_ROOT . '/' . $pdfSRC);
             Controller::sendFileToBrowser($pdfSRC);
-
         } catch (\CloudConvert\Exceptions\ApiBadRequestException $e)
         {
             echo "Something with your request is wrong: " . $e->getMessage();
@@ -180,8 +180,6 @@ class CrmService
             // network problems, etc..
             echo "Something else went wrong: " . $e->getMessage() . "\n";
         }
-
     }
-
 
 }

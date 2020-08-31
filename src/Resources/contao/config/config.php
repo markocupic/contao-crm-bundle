@@ -4,6 +4,7 @@
  * This file is part of a markocupic Contao Bundle.
  *
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
  * @author     Marko Cupic
  * @package    Contao CRM Bundle
  * @license    MIT
@@ -17,7 +18,6 @@ if (TL_MODE == 'BE')
     $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/crm/assets/js/markocupic_crm_be.js';
 }
 
-
 /**
  * Backend modules
  */
@@ -29,7 +29,6 @@ $GLOBALS['BE_MOD']['crm']['customer'] = [
 $GLOBALS['BE_MOD']['crm']['service'] = [
     'tables' => ['tl_crm_service'],
 ];
-
 
 /**
  * Models
