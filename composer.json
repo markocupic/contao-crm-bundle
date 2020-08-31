@@ -24,7 +24,8 @@
   "require": {
     "contao/core-bundle": "^4.9",
     "cloudconvert/cloudconvert-php": "2.2.*",
-    "phpoffice/phpword": "^0.17"
+    "phpoffice/phpword": "^0.17",
+    "markocupic/phpoffice-bundle": "^1.0"
   },
   "require-dev": {
     "contao/test-case": "^4.0",

@@ -1,0 +1,10 @@
+
+.tl_listing .list-service-row-1{
+  font-weight: bold;
+}
+.tl_listing .invoice-paid .list-service-row-1{
+  color: #00dd00;
+}
+.tl_listing .invoice-delivered .list-service-row-1{
+  color: #ff2117;
+}

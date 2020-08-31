@@ -14,8 +14,8 @@
 
 if (TL_MODE == 'BE')
 {
-    $GLOBALS['TL_CSS'][] = 'system/modules/crm/assets/css/markocupic_crm_be.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/crm/assets/js/markocupic_crm_be.js';
+    $GLOBALS['TL_CSS'][] = 'bundles/markocupiccontaocrm/css/markocupic_crm_be.css';
+    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaocrm/images/js/markocupic_crm_be.js';
 }
 
 /**

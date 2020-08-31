@@ -69,12 +69,12 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'generateInvoiceDocx' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
                 'href'  => 'action=generateInvoice&type=docx',
-                'icon'  => 'system/modules/crm/assets/images/page_white_word.png'
+                'icon'  => 'bundles/markocupiccontaocrm/images/page_white_word.png'
             ],
             'generateInvoicePdf'  => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
                 'href'  => 'action=generateInvoice&type=pdf',
-                'icon'  => 'system/modules/crm/assets/images/page_white_acrobat.png'
+                'icon'  => 'bundles/markocupiccontaocrm/images/page_white_acrobat.png'
             ],
         ]
     ],
@@ -314,7 +314,7 @@ class tl_crm_service extends \Contao\Backend
         }
         $key = $arrRow['invoiceType'];
         $titleAttr = $arrRow['paid'] ? $GLOBALS['TL_LANG']['tl_crm_service']['paid'][0] : $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$key][0];
-        return sprintf($strService, $class, $titleAttr, CrmCustomerModel::findByPk($arrRow['toCustomer'])->company, $arrRow['title'], $GLOBALS["TL_LANG"]["MSC"]["invoiceNumber"], $arrRow['invoiceNumber'], $GLOBALS["TL_LANG"]["MSC"]["projectId"], str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT), $GLOBALS["TL_LANG"]["MSC"]["projectPrice"], $arrRow['price'] . ' ' . $arrRow['currency']);
+        return sprintf($strService, $class, $titleAttr, \Markocupic\ContaoCrmBundle\Model\CrmCustomerModel::findByPk($arrRow['toCustomer'])->company, $arrRow['title'], $GLOBALS["TL_LANG"]["MSC"]["invoiceNumber"], $arrRow['invoiceNumber'], $GLOBALS["TL_LANG"]["MSC"]["projectId"], str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT), $GLOBALS["TL_LANG"]["MSC"]["projectPrice"], $arrRow['price'] . ' ' . $arrRow['currency']);
     }
 
 }
