@@ -1,4 +1,8 @@
 services:
 
   Markocupic\ContaoCrmBundle\Crm\CrmService:
+    arguments:
+      - '@contao.framework'
+      - '@translator'
+      - '%kernel.project_dir%'
     public: true

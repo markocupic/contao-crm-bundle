@@ -277,7 +277,8 @@ class tl_crm_service extends \Contao\Backend
 
         if (\Contao\Input::get('action') == 'generateInvoice')
         {
-            \Markocupic\ContaoCrmBundle\Crm\CrmService::generateInvoice(\Contao\Input::get('id'), \Contao\Input::get('type'));
+            $objCrmHelper = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Crm\CrmService::class);
+            $objCrmHelper->generateInvoice(\Contao\Input::get('id'), \Contao\Input::get('type'));
         }
     }
 
