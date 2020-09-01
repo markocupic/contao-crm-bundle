@@ -21,7 +21,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,
         'onload_callback'  => [
-            ['tl_crm_service', 'onloadCb']
+            ['tl_crm_service', 'checkCloudConvertApiKey']
         ],
         'sql'              => [
             'keys' => [
@@ -295,9 +295,15 @@ class tl_crm_service extends \Contao\Backend
         }
     }
 
-    public function onloadCb()
+    /**
+     * Check Cloudconvert API key
+     */
+    public function checkCloudConvertApiKey()
     {
-        //
+        if(!\Contao\Config::get('clodConvertApiKey'))
+        {
+            \Contao\Message::addInfo('Please add your Cloudconvert API key in the Contao backend settings for downloading pdf invoices.');
+        }
     }
 
     /**
