@@ -184,7 +184,7 @@ class Generator
             $templateProcessor->replace('INVOICE_TEXT', $objInvoice->defaultInvoiceText, ['multiline' => true]);
         }
 
-        $templateProcessor->sendToBrowser(true)
+        $templateProcessor->sendToBrowser(false)
             ->generateUncached(true)
             ->generate();
 
@@ -192,7 +192,7 @@ class Generator
         $templateProcessor->saveAs($this->projectDir . '/' . static::$tempDir . '/' . $filename);
         sleep(2);
 
-        if ($format === 'pdf')
+        if ($format == 'pdf')
         {
             $this->sendPdfToBrowser(static::$tempDir . '/' . $filename);
         }
