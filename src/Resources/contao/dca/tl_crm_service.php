@@ -289,8 +289,9 @@ class tl_crm_service extends \Contao\Backend
 
         if (\Contao\Input::get('action') == 'generateInvoice')
         {
+            $objInvoice = \Markocupic\ContaoCrmBundle\Model\CrmServiceModel::findByPk(\Contao\Input::get('id'));
             $objInvoiceGenerator = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Invoice\Generator::class);
-            $objInvoiceGenerator->generateInvoice(\Contao\Input::get('id'), \Contao\Input::get('type'));
+            $objInvoiceGenerator->generateInvoice($objInvoice, \Contao\Input::get('type'));
         }
     }
 

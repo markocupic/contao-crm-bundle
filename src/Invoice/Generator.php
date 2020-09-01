@@ -16,17 +16,17 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoCrmBundle\Invoice;
 
-use CloudConvert\Api;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
-use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Contao\FilesModel;
 use Contao\Date;
-use Contao\Database;
-use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf;
+use Markocupic\ContaoCrmBundle\Invoice\Docx\Docx;
+use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
+use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -45,6 +45,12 @@ class Generator
     /** @var ContaoFramework */
     protected $framework;
 
+    /** @var Docx */
+    protected $docx;
+
+    /** @var Pdf */
+    protected $pdf;
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -55,33 +61,42 @@ class Generator
      * Generator constructor.
      *
      * @param ContaoFramework $framework
+     * @param Docx $docx
+     * @param Pdf $pdf
      * @param TranslatorInterface $translator
      * @param string $projectDir
      */
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $projectDir)
+    public function __construct(ContaoFramework $framework, Docx $docx, Pdf $pdf, TranslatorInterface $translator, string $projectDir)
     {
 
         $this->framework = $framework;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
+        $this->docx = $docx;
+        $this->pdf = $pdf;
     }
+
+
 
     /**
      * Generate the invoice from a docx template
      *
-     * @param $id
+     * @param CrmServiceModel $objService
      * @param string $format
+     * @throws \CloudConvert\Exceptions\ApiException
      * @throws \CloudConvert\Exceptions\InvalidParameterException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \PhpOffice\PhpWord\Exception\CopyFileException
      * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
-     * @throws \PhpOffice\PhpWord\Exception\Exception
      */
-    public function generateInvoice($id, string $format = 'docx')
+    public function generateInvoice(CrmServiceModel $objService, string $format = 'docx')
     {
 
-        /** @var Database $databaseAdapter */
-        $databaseAdapter = $this->framework->getAdapter(Database::class);
+        /** @var CrmServiceModel $crmServiceModelAdapter */
+        $crmServiceModelAdapter = $this->framework->getAdapter(CrmServiceModel::class);
+
+        /** @var $crmCustomerModelAdapter */
+        $crmCustomerModelAdapter = $this->framework->getAdapter(CrmCustomerModel::class);
 
         /** @var Validator $validatorAdapter */
         $validatorAdapter = $this->framework->getAdapter(Validator::class);
@@ -92,28 +107,23 @@ class Generator
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
 
         // Load language
         $systemAdapter->loadLanguageFile('tl_crm_service');
 
-        // Load the invoice and customer data
-        $objInvoice = $databaseAdapter->getInstance()
-            ->prepare('SELECT * FROM tl_crm_service WHERE id=?')
-            ->execute($id);
-
-        $objCustomer = $databaseAdapter->getInstance()
-            ->prepare('SELECT * FROM tl_crm_customer WHERE id=?')
-            ->execute($objInvoice->toCustomer);
+        // Get customer object
+        $objCustomer = $crmCustomerModelAdapter->findByPk($objService->toCustomer);
+        if (null === $objCustomer)
+        {
+            throw new \Exception(sprintf('Datarecord tl_crm_customer with ID %s is null.', $objService->toCustomer));
+        }
 
         // Get the template path
-        if ($objInvoice->crmInvoiceTpl != '' || $validatorAdapter->isUuid($objInvoice->crmInvoiceTpl))
+        if ($objService->crmInvoiceTpl != '' || $validatorAdapter->isUuid($objService->crmInvoiceTpl))
         {
-            $objTplFile = $filesModelAdapter->findByUuid($objInvoice->crmInvoiceTpl);
+            $objTplFile = $filesModelAdapter->findByUuid($objService->crmInvoiceTpl);
             if ($objTplFile !== null)
             {
                 static::$tplSrc = $objTplFile->path;
@@ -121,131 +131,54 @@ class Generator
         }
 
         // Generate filename
-        $type = $this->translator->trans('tl_crm_service.invoiceTypeReference.' . $objInvoice->invoiceType . '.1', [], 'contao_default');
+        $type = $this->translator->trans('tl_crm_service.invoiceTypeReference.' . $objService->invoiceType . '.1', [], 'contao_default');
         $filename = sprintf(
             '%s_%s_%s_%s.docx',
             $type,
-            $dateAdapter->parse('Ymd', $objInvoice->invoiceDate),
-            str_pad($objInvoice->id, 7, '0', STR_PAD_LEFT),
+            $dateAdapter->parse('Ymd', $objService->invoiceDate),
+            str_pad($objService->id, 7, '0', STR_PAD_LEFT),
             str_replace(' ', '-', $objCustomer->company)
         );
 
-        // Instantiate the Template processor
-        $templateProcessor = new MsWordTemplateProcessor(static::$tplSrc, static::$tempDir . '/' . $filename);
-        $templateProcessor->replace('invoiceAddress', $objCustomer->invoiceAddress, ['multiline' => true]);
-        $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
-        $templateProcessor->replace('ustId', $ustNumber);
-        $templateProcessor->replace('invoiceDate', $dateAdapter->parse('d.m.Y', $objInvoice->invoiceDate));
-        $templateProcessor->replace('projectId', $this->translator->trans('MSC.projectId', [], 'contao_default') . ': ' . str_pad($objInvoice->id, 7, '0', STR_PAD_LEFT));
+        $destinationSrc = static::$tempDir . '/' . $filename;
 
-        if ($objInvoice->invoiceType == 'invoiceDelivered')
+        $objFile = $this->docx->generate($objService, $objCustomer, static::$tplSrc, $destinationSrc);
+        if ($objFile instanceof File)
         {
-            $invoiceNumber = $this->translator->trans('MSC.invoiceNumber', [], 'contao_default') . ': ' . $objInvoice->invoiceNumber;
-        }
-        else
-        {
-            $invoiceNumber = '';
-        }
-        // Invoice Number
-        $templateProcessor->replace('invoiceNumber', $invoiceNumber);
-
-        // Invoice type
-        $templateProcessor->replace('invoiceType', strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1]));
-
-        // Customer ID
-        $customerId = $this->translator->trans('MSC.customerId', [], 'contao_default') . ': ' . str_pad($objCustomer->id, 7, '0', STR_PAD_LEFT);
-        $templateProcessor->replace('customerId', $customerId);
-
-        // Invoice table
-        $arrServices = $stringUtilAdapter->deserialize($objInvoice->servicePositions, true);
-        $quantityTotal = 0;
-        foreach ($arrServices as $key => $arrService)
-        {
-            $i = $key + 1;
-            $quantityTotal += $arrService['quantity'];
-            $templateProcessor->createClone('a');
-            $templateProcessor->addToClone('a', 'a', $this->prepareString((string) $i), ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'b', $this->prepareString($arrService['item']), ['multiline' => true]);
-            $templateProcessor->addToClone('a', 'c', $arrService['quantity'], ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'd', $this->prepareString($objInvoice->currency), ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'e', $this->prepareString($arrService['price']), ['multiline' => false]);
-        }
-
-        $templateProcessor->replace('f', $quantityTotal);
-        $templateProcessor->replace('g', $objInvoice->currency);
-        $templateProcessor->replace('h', $objInvoice->price);
-
-        if ($objInvoice->alternativeInvoiceText != '')
-        {
-            $templateProcessor->replace('INVOICE_TEXT', $objInvoice->alternativeInvoiceText, ['multiline' => true]);
-        }
-        else
-        {
-            $templateProcessor->replace('INVOICE_TEXT', $objInvoice->defaultInvoiceText, ['multiline' => true]);
-        }
-
-        $templateProcessor->sendToBrowser(false)
-            ->generateUncached(true)
-            ->generate();
-
-        // Save docx into the temp dir in system/tmp
-        $templateProcessor->saveAs($this->projectDir . '/' . static::$tempDir . '/' . $filename);
-        sleep(2);
-
-        if ($format == 'pdf')
-        {
-            $this->sendPdfToBrowser(static::$tempDir . '/' . $filename);
-        }
-        else
-        {
-            $objFile = new File(static::$tempDir . '/' . $filename);
-            $objFile->sendToBrowser();
+            if ($format == 'pdf')
+            {
+                $this->sendPdfToBrowser($objFile);
+            }
+            else
+            {
+                $objFile->sendToBrowser();
+            }
         }
     }
 
     /**
      * Convert docx to pdf
      *
-     * @param string $docxSRC
+     * @param File $objFile
+     * @throws \CloudConvert\Exceptions\ApiException
      * @throws \CloudConvert\Exceptions\InvalidParameterException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function sendPdfToBrowser(string $docxSRC)
+    protected function sendPdfToBrowser(File $objFile)
     {
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
 
-        if (!$configAdapter->get('clodConvertApiKey'))
+        if (empty($apiKey = $configAdapter->get('clodConvertApiKey')))
         {
             new \Exception('No API Key defined for the Cloud Convert Service. https://cloudconvert.com/api');
         }
 
-        $key = $configAdapter->get('clodConvertApiKey');
-
-        $path_parts = pathinfo($docxSRC);
-        $dirname = $path_parts['dirname'];
-        $filename = $path_parts['filename'];
-        $pdfSRC = $dirname . '/' . $filename . '.pdf';
-
-        $api = new Api($key);
-        try
+        $objFile = $this->pdf->generate($objFile, $apiKey);
+        if ($objFile instanceof File)
         {
-            $api->convert([
-                'inputformat'  => 'docx',
-                'outputformat' => 'pdf',
-                'input'        => 'upload',
-                'file'         => fopen($this->projectDir . '/' . $docxSRC, 'r'),
-            ])
-                ->wait()
-                ->download($this->projectDir . '/' . $pdfSRC);
-
-            $objFile = new File($pdfSRC);
             $objFile->sendToBrowser();
-        } catch (\Exception $e)
-        {
-            // network problems, etc..
-            throw new \Exception('Could not convert from docx to pdf. ' . $e->getMessage());
         }
     }
 

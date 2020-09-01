@@ -3,6 +3,20 @@ services:
   Markocupic\ContaoCrmBundle\Invoice\Generator:
     arguments:
       - '@contao.framework'
+      - '@Markocupic\ContaoCrmBundle\Invoice\Docx\Docx'
+      - '@Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf'
       - '@translator'
+      - '%kernel.project_dir%'
+    public: true
+
+  Markocupic\ContaoCrmBundle\Invoice\Docx\Docx:
+    arguments:
+      - '@contao.framework'
+      - '@translator'
+      - '%kernel.project_dir%'
+    public: true
+
+  Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf:
+    arguments:
       - '%kernel.project_dir%'
     public: true
