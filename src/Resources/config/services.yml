@@ -1,6 +1,6 @@
 services:
 
-  Markocupic\ContaoCrmBundle\Crm\CrmService:
+  Markocupic\ContaoCrmBundle\Invoice\Generator:
     arguments:
       - '@contao.framework'
       - '@translator'

@@ -1,6 +1,18 @@
 <?php
 
 /**
+ * This file is part of a markocupic Contao Bundle.
+ *
+ * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
+ * @author     Marko Cupic
+ * @package    Contao CRM Bundle
+ * @license    MIT
+ * @see        https://github.com/markocupic/contao-crm-bundle
+ *
+ */
+
+/**
  * Table tl_crm_service
  */
 $GLOBALS['TL_DCA']['tl_crm_service'] = [
@@ -277,8 +289,8 @@ class tl_crm_service extends \Contao\Backend
 
         if (\Contao\Input::get('action') == 'generateInvoice')
         {
-            $objCrmHelper = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Crm\CrmService::class);
-            $objCrmHelper->generateInvoice(\Contao\Input::get('id'), \Contao\Input::get('type'));
+            $objInvoiceGenerator = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Invoice\Generator::class);
+            $objInvoiceGenerator->generateInvoice(\Contao\Input::get('id'), \Contao\Input::get('type'));
         }
     }
 

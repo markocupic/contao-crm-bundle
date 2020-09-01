@@ -1,11 +1,15 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * This file is part of a markocupic Contao Bundle.
  *
- * Copyright (c) 2005-2016 Leo Feyer
+ * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
  *
- * @license LGPL-3.0+
+ * @author     Marko Cupic
+ * @package    Contao CRM Bundle
+ * @license    MIT
+ * @see        https://github.com/markocupic/contao-crm-bundle
+ *
  */
 
 /**

@@ -4,6 +4,7 @@
  * This file is part of a markocupic Contao Bundle.
  *
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ *
  * @author     Marko Cupic
  * @package    Contao CRM Bundle
  * @license    MIT
@@ -13,13 +14,13 @@
 
 declare(strict_types=1);
 
-namespace Markocupic\ContaoCrmBundle\Crm;
+namespace Markocupic\ContaoCrmBundle\Invoice;
 
 use CloudConvert\Api;
 use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\File;
 use Contao\StringUtil;
-use Contao\Controller;
 use Contao\System;
 use Contao\Validator;
 use Contao\FilesModel;
@@ -29,11 +30,11 @@ use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class CrmService
+ * Class Generator
  *
- * @package Markocupic\ContaoCrmBundle\Crm
+ * @package Markocupic\ContaoCrmBundle\Invoice
  */
-class CrmService
+class Generator
 {
     /** @var string */
     protected static $tplSrc = 'vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates/crm_invoice_template_default.docx';
@@ -51,7 +52,7 @@ class CrmService
     protected $projectDir;
 
     /**
-     * CrmService constructor.
+     * Generator constructor.
      *
      * @param ContaoFramework $framework
      * @param TranslatorInterface $translator
@@ -97,9 +98,6 @@ class CrmService
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
         // Load language
         $systemAdapter->loadLanguageFile('tl_crm_service');
 
@@ -128,20 +126,17 @@ class CrmService
             '%s_%s_%s_%s.docx',
             $type,
             $dateAdapter->parse('Ymd', $objInvoice->invoiceDate),
-            str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT),
+            str_pad($objInvoice->id, 7, '0', STR_PAD_LEFT),
             str_replace(' ', '-', $objCustomer->company)
         );
 
-        $target = static::$tempDir . '/' . $filename;
-
         // Instantiate the Template processor
-        $templateProcessor = new MsWordTemplateProcessor(static::$tplSrc, $target);
-
+        $templateProcessor = new MsWordTemplateProcessor(static::$tplSrc, static::$tempDir . '/' . $filename);
         $templateProcessor->replace('invoiceAddress', $objCustomer->invoiceAddress, ['multiline' => true]);
         $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
         $templateProcessor->replace('ustId', $ustNumber);
         $templateProcessor->replace('invoiceDate', $dateAdapter->parse('d.m.Y', $objInvoice->invoiceDate));
-        $templateProcessor->replace('projectId', $this->translator->trans('MSC.projectId', [], 'contao_default') . ': ' . str_pad($objInvoice->id, 7, 0, STR_PAD_LEFT));
+        $templateProcessor->replace('projectId', $this->translator->trans('MSC.projectId', [], 'contao_default') . ': ' . str_pad($objInvoice->id, 7, '0', STR_PAD_LEFT));
 
         if ($objInvoice->invoiceType == 'invoiceDelivered')
         {
@@ -158,19 +153,18 @@ class CrmService
         $templateProcessor->replace('invoiceType', strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objInvoice->invoiceType][1]));
 
         // Customer ID
-        $customerId = $this->translator->trans('MSC.customerId', [], 'contao_default') . ': ' . str_pad($objCustomer->id, 7, 0, STR_PAD_LEFT);
+        $customerId = $this->translator->trans('MSC.customerId', [], 'contao_default') . ': ' . str_pad($objCustomer->id, 7, '0', STR_PAD_LEFT);
         $templateProcessor->replace('customerId', $customerId);
 
         // Invoice table
         $arrServices = $stringUtilAdapter->deserialize($objInvoice->servicePositions, true);
-        $templateProcessor->cloneRow('a', count($arrServices));
         $quantityTotal = 0;
         foreach ($arrServices as $key => $arrService)
         {
             $i = $key + 1;
             $quantityTotal += $arrService['quantity'];
             $templateProcessor->createClone('a');
-            $templateProcessor->addToClone('a', 'a', $this->prepareString($i), ['multiline' => false]);
+            $templateProcessor->addToClone('a', 'a', $this->prepareString((string) $i), ['multiline' => false]);
             $templateProcessor->addToClone('a', 'b', $this->prepareString($arrService['item']), ['multiline' => true]);
             $templateProcessor->addToClone('a', 'c', $arrService['quantity'], ['multiline' => false]);
             $templateProcessor->addToClone('a', 'd', $this->prepareString($objInvoice->currency), ['multiline' => false]);
@@ -190,16 +184,22 @@ class CrmService
             $templateProcessor->replace('INVOICE_TEXT', $objInvoice->defaultInvoiceText, ['multiline' => true]);
         }
 
-        $templateProcessor->saveAs($this->projectDir . '/' . $target);
+        $templateProcessor->sendToBrowser(true)
+            ->generateUncached(true)
+            ->generate();
+
+        // Save docx into the temp dir in system/tmp
+        $templateProcessor->saveAs($this->projectDir . '/' . static::$tempDir . '/' . $filename);
         sleep(2);
 
-        if ($format == 'pdf')
+        if ($format === 'pdf')
         {
-            $this->sendPdfToBrowser('files/Rechnungen/' . $filename);
+            $this->sendPdfToBrowser(static::$tempDir . '/' . $filename);
         }
         else
         {
-            $controllerAdapter->sendFileToBrowser('files/Rechnungen/' . $filename);
+            $objFile = new File(static::$tempDir . '/' . $filename);
+            $objFile->sendToBrowser();
         }
     }
 
@@ -212,9 +212,6 @@ class CrmService
      */
     protected function sendPdfToBrowser(string $docxSRC)
     {
-
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
 
         /** @var Config $configAdapter */
         $configAdapter = $this->framework->getAdapter(Config::class);
@@ -243,11 +240,12 @@ class CrmService
                 ->wait()
                 ->download($this->projectDir . '/' . $pdfSRC);
 
-            $controllerAdapter->sendFileToBrowser($pdfSRC);
+            $objFile = new File($pdfSRC);
+            $objFile->sendToBrowser();
         } catch (\Exception $e)
         {
             // network problems, etc..
-            echo "Something else went wrong: " . $e->getMessage() . "\n";
+            throw new \Exception('Could not convert from docx to pdf. ' . $e->getMessage());
         }
     }
 
