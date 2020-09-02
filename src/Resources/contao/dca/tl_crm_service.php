@@ -300,7 +300,8 @@ class tl_crm_service extends \Contao\Backend
      */
     public function checkCloudConvertApiKey()
     {
-        if(!\Contao\System::getContainer()->getParameter('markocupic_contao_crm.cloudconcert_api_key'))
+
+        if (!\Contao\System::getContainer()->getParameter('markocupic_contao_crm.cloudconvert_api_key'))
         {
             \Contao\Message::addInfo('Please read the README.md in vendor/markocupic/contao-crm-bundle and add your Cloudconvert API key in config/config.yml for downloading pdf invoices.');
         }
@@ -324,16 +325,20 @@ class tl_crm_service extends \Contao\Backend
     <div class="list-service-row-4">%s: %s</div>
     <div class="list-service-row-5">%s: %s</div>
 </div>';
+
         if ($arrRow['invoiceType'] == 'invoiceDelivered')
         {
             $class = ' invoiceDelivered';
         }
+
         if ($arrRow['paid'])
         {
             $class = ' invoicePaid';
         }
+
         $key = $arrRow['invoiceType'];
         $titleAttr = $arrRow['paid'] ? $GLOBALS['TL_LANG']['tl_crm_service']['paid'][0] : $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$key][0];
+
         return sprintf($strService, $class, $titleAttr, \Markocupic\ContaoCrmBundle\Model\CrmCustomerModel::findByPk($arrRow['toCustomer'])->company, $arrRow['title'], $GLOBALS["TL_LANG"]["MSC"]["invoiceNumber"], $arrRow['invoiceNumber'], $GLOBALS["TL_LANG"]["MSC"]["projectId"], str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT), $GLOBALS["TL_LANG"]["MSC"]["projectPrice"], $arrRow['price'] . ' ' . $arrRow['currency']);
     }
 
