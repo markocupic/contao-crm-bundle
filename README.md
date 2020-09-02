@@ -15,3 +15,12 @@ markocupic_contao_crm:
 
 ```
 
+## Standard Rechnungsdatei updatesicher überschreiben
+Um das Standard-Rechnungs-Template in "vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates"
+mit einem Custom-Template updatesicher zu ersetzen, muss der Pfad zur docx-Datei mit dem entsprechenden Parameter in der "config/config.yml" angegeben werden.
+
+```
+markocupic_contao_crm:
+  docx_invoice_template: 'files/crm/templates/docx/my_custom_invoice.docx'
+
+```
