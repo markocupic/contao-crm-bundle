@@ -18,6 +18,7 @@ namespace Markocupic\ContaoCrmBundle\Invoice\Pdf;
 
 use CloudConvert\Api;
 use Contao\File;
+use Contao\System;
 
 /**
  * Class Pdf
@@ -30,29 +31,38 @@ class Pdf
     /** @var string */
     protected $projectDir;
 
+    /** @var string */
+    protected $cloudconvertApiKey;
+
     /**
      * Pdf constructor.
      *
      * @param string $projectDir
+     * @param string $cloudconvertApiKey
      */
-    public function __construct(string $projectDir)
+    public function __construct(string $projectDir, string $cloudconvertApiKey = '')
     {
 
         $this->projectDir = $projectDir;
+        $this->cloudconvertApiKey = $cloudconvertApiKey;
     }
 
     /**
      * Convert docx to pdf
      *
      * @param File $objFile
-     * @param string $apiKey
      * @return File
      * @throws \CloudConvert\Exceptions\ApiException
      * @throws \CloudConvert\Exceptions\InvalidParameterException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function generate(File $objFile, string $apiKey): File
+    public function generate(File $objFile): File
     {
+
+        if (empty($this->cloudconvertApiKey))
+        {
+            new \Exception('No API Key defined for the Cloud Convert Service. https://cloudconvert.com/api');
+        }
 
         $pdfSrc = preg_replace('/\.docx$/', '.pdf', $objFile->path);
 
@@ -62,7 +72,7 @@ class Pdf
             unlink($this->projectDir . '/' . $pdfSrc);
         }
 
-        $api = new Api($apiKey);
+        $api = new Api($this->cloudconvertApiKey);
 
         $api->convert([
             'inputformat'  => 'docx',

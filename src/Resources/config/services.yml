@@ -7,6 +7,8 @@ services:
       - '@Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf'
       - '@translator'
       - '%kernel.project_dir%'
+      - '%markocupic_contao_crm.docx_invoice_template%'
+      - '%markocupic_contao_crm.temp_dir%'
     public: true
 
   Markocupic\ContaoCrmBundle\Invoice\Docx\Docx:
@@ -19,4 +21,5 @@ services:
   Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf:
     arguments:
       - '%kernel.project_dir%'
+      - '%markocupic_contao_crm.cloudconvert_api_key%'
     public: true

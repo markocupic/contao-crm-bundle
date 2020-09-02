@@ -16,7 +16,6 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoCrmBundle\Invoice;
 
-use Contao\Config;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\File;
 use Contao\System;
@@ -36,11 +35,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class Generator
 {
-    /** @var string */
-    protected static $tplSrc = 'vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates/crm_invoice_template_default.docx';
-
-    /** @var string */
-    protected static $tempDir = 'system/tmp';
 
     /** @var ContaoFramework */
     protected $framework;
@@ -57,6 +51,12 @@ class Generator
     /** @var string */
     protected $projectDir;
 
+    /** @var string */
+    protected $docxInvoiceTemplate;
+
+    /** @var string */
+    protected $tempDir;
+
     /**
      * Generator constructor.
      *
@@ -65,18 +65,20 @@ class Generator
      * @param Pdf $pdf
      * @param TranslatorInterface $translator
      * @param string $projectDir
+     * @param string $docxInvoiceTemplate
+     * @param string $tempDir
      */
-    public function __construct(ContaoFramework $framework, Docx $docx, Pdf $pdf, TranslatorInterface $translator, string $projectDir)
+    public function __construct(ContaoFramework $framework, Docx $docx, Pdf $pdf, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
     {
 
         $this->framework = $framework;
-        $this->translator = $translator;
-        $this->projectDir = $projectDir;
         $this->docx = $docx;
         $this->pdf = $pdf;
+        $this->translator = $translator;
+        $this->projectDir = $projectDir;
+        $this->docxInvoiceTemplate = $docxInvoiceTemplate;
+        $this->tempDir = $tempDir;
     }
-
-
 
     /**
      * Generate the invoice from a docx template
@@ -91,9 +93,6 @@ class Generator
      */
     public function generateInvoice(CrmServiceModel $objService, string $format = 'docx')
     {
-
-        /** @var CrmServiceModel $crmServiceModelAdapter */
-        $crmServiceModelAdapter = $this->framework->getAdapter(CrmServiceModel::class);
 
         /** @var $crmCustomerModelAdapter */
         $crmCustomerModelAdapter = $this->framework->getAdapter(CrmCustomerModel::class);
@@ -126,7 +125,7 @@ class Generator
             $objTplFile = $filesModelAdapter->findByUuid($objService->crmInvoiceTpl);
             if ($objTplFile !== null)
             {
-                static::$tplSrc = $objTplFile->path;
+                $this->docxInvoiceTemplate = $objTplFile->path;
             }
         }
 
@@ -140,9 +139,9 @@ class Generator
             str_replace(' ', '-', $objCustomer->company)
         );
 
-        $destinationSrc = static::$tempDir . '/' . $filename;
+        $destinationSrc = $this->tempDir . '/' . $filename;
 
-        $objFile = $this->docx->generate($objService, $objCustomer, static::$tplSrc, $destinationSrc);
+        $objFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
         if ($objFile instanceof File)
         {
             if ($format == 'pdf')
@@ -167,15 +166,7 @@ class Generator
     protected function sendPdfToBrowser(File $objFile)
     {
 
-        /** @var Config $configAdapter */
-        $configAdapter = $this->framework->getAdapter(Config::class);
-
-        if (empty($apiKey = $configAdapter->get('clodConvertApiKey')))
-        {
-            new \Exception('No API Key defined for the Cloud Convert Service. https://cloudconvert.com/api');
-        }
-
-        $objFile = $this->pdf->generate($objFile, $apiKey);
+        $objFile = $this->pdf->generate($objFile);
         if ($objFile instanceof File)
         {
             $objFile->sendToBrowser();
