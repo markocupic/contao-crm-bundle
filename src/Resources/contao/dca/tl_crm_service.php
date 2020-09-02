@@ -301,7 +301,7 @@ class tl_crm_service extends \Contao\Backend
     public function checkCloudConvertApiKey()
     {
 
-        if (!\Contao\System::getContainer()->getParameter('markocupic_contao_crm.cloudconvert_api_key'))
+        if (empty(\Contao\System::getContainer()->getParameter('markocupic_contao_crm.cloudconvert_api_key')))
         {
             \Contao\Message::addInfo('Please read the README.md in vendor/markocupic/contao-crm-bundle and add your Cloudconvert API key in config/config.yml for downloading pdf invoices.');
         }
