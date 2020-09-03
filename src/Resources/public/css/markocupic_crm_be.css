@@ -8,3 +8,7 @@
 .tl_listing .invoice-delivered .list-service-row-1{
   color: #ff2117;
 }
+.tl_listing .generateInvoiceDocx img, .tl_listing .generateInvoicePdf img{
+  width: 16px;
+  height: auto;
+}

@@ -79,13 +79,13 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                 'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
                 'href'            => 'action=generateInvoice&type=docx',
                 'button_callback' => ['tl_crm_service', 'generateInvoice'],
-                'icon'            => 'bundles/markocupiccontaocrm/images/page_white_word.png'
+                'icon'            => 'bundles/markocupiccontaocrm/images/docx.svg'
             ],
             'generateInvoicePdf'  => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
                 'href'            => 'action=generateInvoice&type=pdf',
                 'button_callback' => ['tl_crm_service', 'generateInvoice'],
-                'icon'            => 'bundles/markocupiccontaocrm/images/page_white_acrobat.png'
+                'icon'            => 'bundles/markocupiccontaocrm/images/pdf.svg'
             ],
         ]
     ],
