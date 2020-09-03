@@ -293,7 +293,7 @@ class tl_crm_service extends \Contao\Backend
     public function generateInvoice($row, $href, $label, $title, $icon, $attributes)
     {
 
-        if (\Contao\Input::get('id') && \Contao\Input::get('generateInvoice') && \Contao\Input::get('type'))
+        if (\Contao\Input::get('action') === 'generateInvoice' && \Contao\Input::get('id') && \Contao\Input::get('type'))
         {
             $type = \Contao\Input::get('type');
             if (null !== ($objInvoice = \Markocupic\ContaoCrmBundle\Model\CrmServiceModel::findByPk(\Contao\Input::get('id'))))
