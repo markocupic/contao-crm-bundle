@@ -37,13 +37,10 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'fields'             => ['projectDateStart'],
             'flag'               => 8,
             'panelLayout'        => 'filter;sort,search,limit',
-            //'disableGrouping' => true,
-            //'headerFields' => array('invoiceNumber', 'toCustomer', 'title'),
             'child_record_class' => 'no_padding',
         ],
         'label'             => [
             'fields'         => ['invoiceNumber', 'toCustomer', 'title'],
-            //'format' => '%s %s %s',
             'label_callback' => ['tl_crm_service', 'listServices'],
 
         ],
@@ -79,14 +76,16 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                 'icon'  => 'show.gif'
             ],
             'generateInvoiceDocx' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
-                'href'  => 'action=generateInvoice&type=docx',
-                'icon'  => 'bundles/markocupiccontaocrm/images/page_white_word.png'
+                'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
+                'href'            => 'action=generateInvoice&type=docx',
+                'button_callback' => ['tl_crm_service', 'generateInvoice'],
+                'icon'            => 'bundles/markocupiccontaocrm/images/page_white_word.png'
             ],
             'generateInvoicePdf'  => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
-                'href'  => 'action=generateInvoice&type=pdf',
-                'icon'  => 'bundles/markocupiccontaocrm/images/page_white_acrobat.png'
+                'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
+                'href'            => 'action=generateInvoice&type=pdf',
+                'button_callback' => ['tl_crm_service', 'generateInvoice'],
+                'icon'            => 'bundles/markocupiccontaocrm/images/page_white_acrobat.png'
             ],
         ]
     ],
@@ -280,19 +279,31 @@ class tl_crm_service extends \Contao\Backend
 {
 
     /**
-     * tl_crm_service constructor.
+     * Return the print invoice button
+     *
+     * @param array $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
      */
-    public function __construct()
+    public function generateInvoice($row, $href, $label, $title, $icon, $attributes)
     {
 
-        parent::__construct();
-
-        if (\Contao\Input::get('action') == 'generateInvoice')
+        if (\Contao\Input::get('id') && \Contao\Input::get('generateInvoice') && \Contao\Input::get('type'))
         {
-            $objInvoice = \Markocupic\ContaoCrmBundle\Model\CrmServiceModel::findByPk(\Contao\Input::get('id'));
-            $objInvoiceGenerator = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Invoice\Generator::class);
-            $objInvoiceGenerator->generateInvoice($objInvoice, \Contao\Input::get('type'));
+            $type = \Contao\Input::get('type');
+            if (null !== ($objInvoice = \Markocupic\ContaoCrmBundle\Model\CrmServiceModel::findByPk(\Contao\Input::get('id'))))
+            {
+                $objInvoiceGenerator = \Contao\System::getContainer()->get(Markocupic\ContaoCrmBundle\Invoice\Generator::class);
+                $objInvoiceGenerator->generateInvoice($objInvoice, $type);
+            }
         }
+
+        return '<a href="' . $this->addToUrl($href . '&amp;id=' . $row['id']) . '" title="' . Contao\StringUtil::specialchars($title) . '"' . $attributes . '>' . Contao\Image::getHtml($icon, $label) . '</a> ';
     }
 
     /**
