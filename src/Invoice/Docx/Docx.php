@@ -42,6 +42,9 @@ class Docx
     /** @var string */
     protected $projectDir;
 
+    /** @var array */
+    protected $tags = [];
+
     /**
      * Generator constructor.
      *
@@ -55,18 +58,11 @@ class Docx
         $this->framework = $framework;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
-    }
 
-    /**
-     * Generate Invoice
-     *
-     * @param CrmServiceModel $objService
-     * @param string $templSrc
-     * @param string $destinationSrc
-     * @return File|null
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
-     */
+        // Prepare the tags array
+        $this->tags['clones'] = [];
+        $this->tags['tags'] = [];
+    }
 
     /**
      * Generate Invoice
@@ -82,83 +78,43 @@ class Docx
     public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templSrc, string $destinationSrc): File
     {
 
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
 
         // Load language
         $systemAdapter->loadLanguageFile('tl_crm_service');
 
+        $this->setTags($objService, $objCustomer);
+
         // Instantiate the Template processor
         $templateProcessor = new MsWordTemplateProcessor($templSrc, $destinationSrc);
-        $templateProcessor->replace('invoiceAddress', $objCustomer->invoiceAddress, ['multiline' => true]);
-        $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
-        $templateProcessor->replace('ustId', $ustNumber);
-        $templateProcessor->replace('invoiceDate', $dateAdapter->parse('d.m.Y', $objService->invoiceDate));
 
-        $projectId = sprintf(
-            '%s: %s',
-            $this->translator->trans('MSC.projectId', [], 'contao_default'),
-            str_pad($objService->id, 7, '0', STR_PAD_LEFT)
-        );
-        $templateProcessor->replace('projectId', $projectId);
-
-        $invoiceNumber = '';
-        if ($objService->invoiceType == 'invoiceDelivered')
+        // Replace tags
+        if (isset($this->tags['tags']) && is_array($this->tags['tags']))
         {
-            $invoiceNumber = sprintf(
-                '%s: %s',
-                $this->translator->trans('MSC.invoiceNumber', [], 'contao_default'),
-                $objService->invoiceNumber
-            );
+            foreach ($this->tags['tags'] as $key => $arrValue)
+            {
+                $templateProcessor->replace($key, (string) $arrValue[0], $arrValue[1]);
+            }
         }
 
-        // Invoice Number
-        $templateProcessor->replace('invoiceNumber', $invoiceNumber);
-
-        // Invoice type
-        $templateProcessor->replace('invoiceType', strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objService->invoiceType][1]));
-
-        // Customer ID
-        $customerId = sprintf(
-            '%s: %s',
-            $this->translator->trans('MSC.customerId', [], 'contao_default'),
-            str_pad($objCustomer->id, 7, '0', STR_PAD_LEFT)
-        );
-        $templateProcessor->replace('customerId', $customerId);
-
-        // Invoice table
-        $arrServices = $stringUtilAdapter->deserialize($objService->servicePositions, true);
-        $quantityTotal = 0;
-        foreach ($arrServices as $key => $arrService)
+        // Replace clones
+        if (isset($this->tags['clones']) && is_array($this->tags['clones']))
         {
-            $i = $key + 1;
-            $quantityTotal += $arrService['quantity'];
-            $templateProcessor->createClone('a');
-            $templateProcessor->addToClone('a', 'a', $this->prepareString((string) $i), ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'b', $this->prepareString($arrService['item']), ['multiline' => true]);
-            $templateProcessor->addToClone('a', 'c', $arrService['quantity'], ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'd', $this->prepareString($objService->currency), ['multiline' => false]);
-            $templateProcessor->addToClone('a', 'e', $this->prepareString($arrService['price']), ['multiline' => false]);
+            foreach ($this->tags['clones'] as $k => $v)
+            {
+                $templateProcessor->createClone($k);
+                foreach ($v as $vv)
+                {
+                    foreach ($vv as $kkk => $vvv)
+                    {
+                        $templateProcessor->addToClone($k, $kkk, (string) $vvv[0], $vvv[1]);
+                    }
+                }
+            }
         }
 
-        $templateProcessor->replace('f', $quantityTotal);
-        $templateProcessor->replace('g', $objService->currency);
-        $templateProcessor->replace('h', $objService->price);
-
-        if ($objService->alternativeInvoiceText != '')
-        {
-            $templateProcessor->replace('INVOICE_TEXT', $objService->alternativeInvoiceText, ['multiline' => true]);
-        }
-        else
-        {
-            $templateProcessor->replace('INVOICE_TEXT', $objService->defaultInvoiceText, ['multiline' => true]);
-        }
+        // Remove old file
         if (file_exists($this->projectDir . '/' . $destinationSrc))
         {
             unlink($this->projectDir . '/' . $destinationSrc);
@@ -175,6 +131,94 @@ class Docx
         }
 
         throw new \Exception('Failed generating Invoice from docx template.');
+    }
+
+    /**
+     * @param CrmServiceModel $objService
+     * @param CrmCustomerModel $objCustomer
+     */
+    protected function setTags(CrmServiceModel $objService, CrmCustomerModel $objCustomer): void
+    {
+
+        /** @var Date $dateAdapter */
+        $dateAdapter = $this->framework->getAdapter(Date::class);
+
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+        /** @var System $systemAdapter */
+        $systemAdapter = $this->framework->getAdapter(System::class);
+
+        // Load language
+        $systemAdapter->loadLanguageFile('tl_crm_service');
+
+        // Instantiate the Template processor
+        $this->tags['tags']['invoiceAddress'] = [$objCustomer->invoiceAddress, ['multiline' => true]];
+
+        $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
+        $this->tags['tags']['ustId'] = [$ustNumber, ['multiline' => false]];
+
+        $this->tags['tags']['invoiceDate'] = [$dateAdapter->parse('d.m.Y', $objService->invoiceDate), ['multiline' => false]];
+
+        $projectId = sprintf(
+            '%s: %s',
+            $this->translator->trans('MSC.projectId', [], 'contao_default'),
+            str_pad($objService->id, 7, '0', STR_PAD_LEFT)
+        );
+        $this->tags['tags']['projectId'] = [$projectId, ['multiline' => false]];
+
+        // Invoice Number
+        $invoiceNumber = '';
+        if ($objService->invoiceType == 'invoiceDelivered')
+        {
+            $invoiceNumber = sprintf(
+                '%s: %s',
+                $this->translator->trans('MSC.invoiceNumber', [], 'contao_default'),
+                $objService->invoiceNumber
+            );
+        }
+        $this->tags['tags']['invoiceNumber'] = [$invoiceNumber, ['multiline' => false]];
+
+        // Invoice type
+        $this->tags['tags']['invoiceType'] = [strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objService->invoiceType][1]), ['multiline' => false]];
+
+        // Customer ID
+        $customerId = sprintf(
+            '%s: %s',
+            $this->translator->trans('MSC.customerId', [], 'contao_default'),
+            str_pad($objCustomer->id, 7, '0', STR_PAD_LEFT)
+        );
+        $this->tags['tags']['customerId'] = [$customerId, ['multiline' => false]];
+
+        // Invoice table
+        $arrServices = $stringUtilAdapter->deserialize($objService->servicePositions, true);
+        $quantityTotal = 0;
+        foreach ($arrServices as $key => $arrService)
+        {
+            $i = $key + 1;
+            $quantityTotal += $arrService['quantity'];
+            $this->tags['clones']['a'][] = [
+                'a' => [$this->prepareString((string) $i), ['multiline' => false]],
+                'b' => [$this->prepareString($arrService['item']), ['multiline' => true]],
+                'c' => [$arrService['quantity'], ['multiline' => false]],
+                'd' => [$this->prepareString($objService->currency), ['multiline' => false]],
+                'e' => [$this->prepareString($arrService['price']), ['multiline' => false]],
+            ];
+        }
+
+        $this->tags['tags']['f'] = [$quantityTotal, ['multiline' => false]];
+        $this->tags['tags']['g'] = [$objService->currency, ['multiline' => false]];
+        $this->tags['tags']['h'] = [$objService->price, ['multiline' => false]];
+
+        // Invoice text
+        if ($objService->alternativeInvoiceText != '')
+        {
+            $this->tags['tags']['invoiceText'] = [$objService->alternativeInvoiceText, ['multiline' => true]];
+        }
+        else
+        {
+            $this->tags['tags']['invoiceText'] = [$objService->defautInvoiceText, ['multiline' => true]];
+        }
     }
 
     /**
