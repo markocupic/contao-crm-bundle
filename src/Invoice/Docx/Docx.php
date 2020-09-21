@@ -103,12 +103,16 @@ class Docx
         {
             foreach ($this->tags['clones'] as $k => $v)
             {
-                $templateProcessor->createClone($k);
-                foreach ($v as $vv)
+                foreach ($this->tags['clones'][$k] as $kk => $vv)
                 {
+                    $templateProcessor->createClone($k);
                     foreach ($vv as $kkk => $vvv)
                     {
-                        $templateProcessor->addToClone($k, $kkk, (string) $vvv[0], $vvv[1]);
+                        // $k (clone key)
+                        // $kkk search string
+                        // replace string
+                        // array options e.g. ["multiline" => true]
+                        $templateProcessor->addToClone($k, (string) $kkk, (string) $vvv[0], $vvv[1]);
                     }
                 }
             }
