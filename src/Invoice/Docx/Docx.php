@@ -1,60 +1,61 @@
 <?php
 
-/**
- * This file is part of a markocupic Contao Bundle.
+declare(strict_types=1);
+
+/*
+ * This file is part of Contao Bundle Creator Bundle.
  *
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
- *
- * @author     Marko Cupic
- * @package    Contao CRM Bundle
- * @license    MIT
- * @see        https://github.com/markocupic/contao-crm-bundle
- *
+ * @license MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-crm-bundle
  */
-
-declare(strict_types=1);
 
 namespace Markocupic\ContaoCrmBundle\Invoice\Docx;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\Date;
 use Contao\File;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Date;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class Docx
- *
- * @package Markocupic\ContaoCrmBundle\Docx
+ * Class Docx.
  */
 class Docx
 {
-    /** @var ContaoFramework */
+    /**
+     * @var ContaoFramework
+     */
     protected $framework;
 
-    /** @var TranslatorInterface */
+    /**
+     * @var TranslatorInterface
+     */
     protected $translator;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $projectDir;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $tags = [];
 
     /**
      * Generator constructor.
-     *
-     * @param ContaoFramework $framework
-     * @param TranslatorInterface $translator
-     * @param string $projectDir
      */
     public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $projectDir)
     {
-
         $this->framework = $framework;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
@@ -65,19 +66,13 @@ class Docx
     }
 
     /**
-     * Generate Invoice
+     * Generate Invoice.
      *
-     * @param CrmServiceModel $objService
-     * @param CrmCustomerModel $objCustomer
-     * @param string $templSrc
-     * @param string $destinationSrc
-     * @return File
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
      */
     public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templSrc, string $destinationSrc): File
     {
-
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
 
@@ -90,24 +85,19 @@ class Docx
         $templateProcessor = new MsWordTemplateProcessor($templSrc, $destinationSrc);
 
         // Replace tags
-        if (isset($this->tags['tags']) && is_array($this->tags['tags']))
-        {
-            foreach ($this->tags['tags'] as $key => $arrValue)
-            {
+        if (isset($this->tags['tags']) && \is_array($this->tags['tags'])) {
+            foreach ($this->tags['tags'] as $key => $arrValue) {
                 $templateProcessor->replace($key, (string) $arrValue[0], $arrValue[1]);
             }
         }
 
         // Replace clones
-        if (isset($this->tags['clones']) && is_array($this->tags['clones']))
-        {
-            foreach ($this->tags['clones'] as $k => $v)
-            {
-                foreach ($this->tags['clones'][$k] as $kk => $vv)
-                {
+        if (isset($this->tags['clones']) && \is_array($this->tags['clones'])) {
+            foreach (array_keys($this->tags['clones'] ) as $k) {
+                foreach ($this->tags['clones'][$k] as $vv) {
                     $templateProcessor->createClone($k);
-                    foreach ($vv as $kkk => $vvv)
-                    {
+
+                    foreach ($vv as $kkk => $vvv) {
                         // $k (clone key)
                         // $kkk search string
                         // replace string
@@ -119,31 +109,25 @@ class Docx
         }
 
         // Remove old file
-        if (file_exists($this->projectDir . '/' . $destinationSrc))
-        {
-            unlink($this->projectDir . '/' . $destinationSrc);
+        if (file_exists($this->projectDir.'/'.$destinationSrc)) {
+            unlink($this->projectDir.'/'.$destinationSrc);
         }
 
         // Save file to system/tmp
         $templateProcessor->generateUncached(true)
             ->sendToBrowser(false)
-            ->generate();
+            ->generate()
+        ;
 
-        if (file_exists($this->projectDir . '/' . $destinationSrc))
-        {
+        if (file_exists($this->projectDir.'/'.$destinationSrc)) {
             return new File($destinationSrc);
         }
 
         throw new \Exception('Failed generating Invoice from docx template.');
     }
 
-    /**
-     * @param CrmServiceModel $objService
-     * @param CrmCustomerModel $objCustomer
-     */
     protected function setTags(CrmServiceModel $objService, CrmCustomerModel $objCustomer): void
     {
-
         /** @var Date $dateAdapter */
         $dateAdapter = $this->framework->getAdapter(Date::class);
 
@@ -159,7 +143,7 @@ class Docx
         // Instantiate the Template processor
         $this->tags['tags']['invoiceAddress'] = [$objCustomer->invoiceAddress, ['multiline' => true]];
 
-        $ustNumber = $objCustomer->ustId != '' ? 'Us-tID: ' . $objCustomer->ustId : '';
+        $ustNumber = '' !== $objCustomer->ustId ? 'Us-tID: '.$objCustomer->ustId : '';
         $this->tags['tags']['ustId'] = [$ustNumber, ['multiline' => false]];
 
         $this->tags['tags']['invoiceDate'] = [$dateAdapter->parse('d.m.Y', $objService->invoiceDate), ['multiline' => false]];
@@ -173,8 +157,8 @@ class Docx
 
         // Invoice Number
         $invoiceNumber = '';
-        if ($objService->invoiceType == 'invoiceDelivered')
-        {
+
+        if ('invoiceDelivered' === $objService->invoiceType) {
             $invoiceNumber = sprintf(
                 '%s: %s',
                 $this->translator->trans('MSC.invoiceNumber', [], 'contao_default'),
@@ -197,8 +181,8 @@ class Docx
         // Invoice table
         $arrServices = $stringUtilAdapter->deserialize($objService->servicePositions, true);
         $quantityTotal = 0;
-        foreach ($arrServices as $key => $arrService)
-        {
+
+        foreach ($arrServices as $key => $arrService) {
             $i = $key + 1;
             $quantityTotal += $arrService['quantity'];
             $this->tags['clones']['a'][] = [
@@ -215,29 +199,19 @@ class Docx
         $this->tags['tags']['h'] = [$objService->price, ['multiline' => false]];
 
         // Invoice text
-        if ($objService->alternativeInvoiceText != '')
-        {
+        if ('' !== $objService->alternativeInvoiceText) {
             $this->tags['tags']['invoiceText'] = [$objService->alternativeInvoiceText, ['multiline' => true]];
-        }
-        else
-        {
+        } else {
             $this->tags['tags']['invoiceText'] = [$objService->defautInvoiceText, ['multiline' => true]];
         }
     }
 
-    /**
-     * @param string $string
-     * @return string
-     */
     protected function prepareString(string $string = ''): string
     {
-
-        if (empty($string))
-        {
+        if (empty($string)) {
             return '';
         }
 
         return htmlspecialchars(html_entity_decode((string) $string));
     }
-
 }

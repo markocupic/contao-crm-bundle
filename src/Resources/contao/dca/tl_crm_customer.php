@@ -1,449 +1,448 @@
 <?php
 
-/**
- * This file is part of a markocupic Contao Bundle.
+/*
+ * This file is part of Contao Bundle Creator Bundle.
  *
  * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
- *
- * @author     Marko Cupic
- * @package    Contao CRM Bundle
- * @license    MIT
- * @see        https://github.com/markocupic/contao-crm-bundle
- *
+ * @license MIT
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-crm-bundle
  */
+
+use Contao\DataContainer;
+use Contao\Image;
+use Contao\Input;
+use Contao\ModuleLoader;
+use Contao\System;
+use Contao\Versions;
+use Contao\Backend;
 
 /**
  * Table tl_crm_customer
  */
-$GLOBALS['TL_DCA']['tl_crm_customer'] = [
+$GLOBALS['TL_DCA']['tl_crm_customer'] = array(
+	// Config
+	'config'      => array(
+		'dataContainer'     => 'Table',
+		'enableVersioning'  => true,
+		'onsubmit_callback' => array(
+			array('tl_crm_customer', 'storeDateAdded'),
+		),
+		'sql'               => array(
+			'keys' => array(
+				'id'    => 'primary',
+				'email' => 'index'
+			)
+		)
+	),
 
-    // Config
-    'config'      => [
-        'dataContainer'     => 'Table',
-        'enableVersioning'  => true,
-        'onsubmit_callback' => [
-            ['tl_crm_customer', 'storeDateAdded'],
-        ],
-        'sql'               => [
-            'keys' => [
-                'id'    => 'primary',
-                'email' => 'index'
-            ]
-        ]
-    ],
+	// List
+	'list'        => array(
+		'sorting'           => array(
+			'mode'        => 2,
+			'fields'      => array('dateAdded DESC'),
+			'flag'        => 1,
+			'panelLayout' => 'filter;sort,search,limit'
+		),
+		'label'             => array(
+			'fields'         => array('icon', 'firstname', 'lastname', 'dateAdded'),
+			'showColumns'    => true,
+			'label_callback' => array('tl_crm_customer', 'addIcon')
+		),
+		'global_operations' => array(
+			'all' => array(
+				'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
+				'href'       => 'act=select',
+				'class'      => 'header_edit_all',
+				'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+			)
+		),
+		'operations'        => array(
+			'edit'   => array(
+				'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['edit'],
+				'href'  => 'act=edit',
+				'icon'  => 'edit.gif'
+			),
+			'copy'   => array(
+				'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['copy'],
+				'href'  => 'act=copy',
+				'icon'  => 'copy.gif'
+			),
+			'delete' => array(
+				'label'      => &$GLOBALS['TL_LANG']['tl_crm_customer']['delete'],
+				'href'       => 'act=delete',
+				'icon'       => 'delete.gif',
+				'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+			),
+			'toggle' => array(
+				'label'           => &$GLOBALS['TL_LANG']['tl_crm_customer']['toggle'],
+				'icon'            => 'visible.gif',
+				'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
+				'button_callback' => array('tl_crm_customer', 'toggleIcon')
+			),
+			'show'   => array(
+				'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['show'],
+				'href'  => 'act=show',
+				'icon'  => 'show.gif'
+			)
+		)
+	),
 
-    // List
-    'list'        => [
-        'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['dateAdded DESC'],
-            'flag'        => 1,
-            'panelLayout' => 'filter;sort,search,limit'
-        ],
-        'label'             => [
-            'fields'         => ['icon', 'firstname', 'lastname', 'dateAdded'],
-            'showColumns'    => true,
-            'label_callback' => ['tl_crm_customer', 'addIcon']
-        ],
-        'global_operations' => [
-            'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href'       => 'act=select',
-                'class'      => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            ]
-        ],
-        'operations'        => [
-            'edit'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.gif'
-            ],
-            'copy'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['copy'],
-                'href'  => 'act=copy',
-                'icon'  => 'copy.gif'
-            ],
-            'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_crm_customer']['delete'],
-                'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
-            ],
-            'toggle' => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_crm_customer']['toggle'],
-                'icon'            => 'visible.gif',
-                'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['tl_crm_customer', 'toggleIcon']
-            ],
-            'show'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['show'],
-                'href'  => 'act=show',
-                'icon'  => 'show.gif'
-            ]
-        ]
-    ],
+	// Palettes
+	'palettes'    => array(
+		'__selector__' => array('assignDir'),
+		'default'      => '{personal_legend},firstname,lastname,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{invoice_legend},ustId,invoiceAddress;{homedir_legend:hide},assignDir;{account_legend},disable',
+	),
 
-    // Palettes
-    'palettes'    => [
-        '__selector__' => ['assignDir'],
-        'default'      => '{personal_legend},firstname,lastname,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{invoice_legend},ustId,invoiceAddress;{homedir_legend:hide},assignDir;{account_legend},disable',
-    ],
+	// Subpalettes
+	'subpalettes' => array(
+		'assignDir' => 'homeDir'
+	),
 
-    // Subpalettes
-    'subpalettes' => [
-        'assignDir' => 'homeDir'
-    ],
+	// Fields
+	'fields'      => array(
+		'id'        => array(
+			'sql' => "int(10) unsigned NOT NULL auto_increment"
+		),
+		'tstamp'    => array(
+			'sql' => "int(10) unsigned NOT NULL default '0'"
+		),
+		'firstname' => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['firstname'],
+			'exclude'   => true,
+			'search'    => true,
+			'sorting'   => true,
+			'flag'      => 1,
+			'inputType' => 'text',
+			'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'lastname'  => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['lastname'],
+			'exclude'   => true,
+			'search'    => true,
+			'sorting'   => true,
+			'flag'      => 1,
+			'inputType' => 'text',
+			'eval'      => array('mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'gender'    => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['gender'],
+			'exclude'   => true,
+			'inputType' => 'select',
+			'options'   => array('male', 'female'),
+			'reference' => &$GLOBALS['TL_LANG']['MSC'],
+			'eval'      => array('includeBlankOption' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(32) NOT NULL default ''"
+		),
+		'company'   => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['company'],
+			'exclude'   => true,
+			'search'    => true,
+			'sorting'   => true,
+			'flag'      => 1,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'street'    => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['street'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
 
-    // Fields
-    'fields'      => [
-        'id'        => [
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
-        ],
-        'tstamp'    => [
-            'sql' => "int(10) unsigned NOT NULL default '0'"
-        ],
-        'firstname' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['firstname'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
-            'flag'      => 1,
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'lastname'  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['lastname'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
-            'flag'      => 1,
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'gender'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['gender'],
-            'exclude'   => true,
-            'inputType' => 'select',
-            'options'   => ['male', 'female'],
-            'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => ['includeBlankOption' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''"
-        ],
-        'company'   => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['company'],
-            'exclude'   => true,
-            'search'    => true,
-            'sorting'   => true,
-            'flag'      => 1,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'street'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['street'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-
-        'postal'         => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['postal'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 32, 'tl_class' => 'w50'],
-            'sql'       => "varchar(32) NOT NULL default ''"
-        ],
-        'city'           => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['city'],
-            'exclude'   => true,
-            'filter'    => true,
-            'search'    => true,
-            'sorting'   => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'state'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['state'],
-            'exclude'   => true,
-            'sorting'   => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 64, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''"
-        ],
-        'country'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['country'],
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
-            'inputType' => 'select',
-            'options'   => \Contao\System::getCountries(),
-            'eval'      => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(2) NOT NULL default ''"
-        ],
-        'phone'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['phone'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''"
-        ],
-        'mobile'         => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['mobile'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''"
-        ],
-        'fax'            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['fax'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(64) NOT NULL default ''"
-        ],
-        'email'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['email'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => true, 'decodeEntities' => true, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'website'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['website'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'ustId'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['ustId'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'text',
-            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
-            'sql'       => "varchar(255) NOT NULL default ''"
-        ],
-        'invoiceAddress' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['invoiceAddress'],
-            'exclude'   => true,
-            'search'    => true,
-            'inputType' => 'textarea',
-            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
-            'sql'       => "mediumtext NULL"
-        ],
-        'assignDir'      => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['assignDir'],
-            'exclude'   => true,
-            'inputType' => 'checkbox',
-            'eval'      => ['submitOnChange' => true],
-            'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'disable'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['disable'],
-            'exclude'   => true,
-            'filter'    => true,
-            'inputType' => 'checkbox',
-            'sql'       => "char(1) NOT NULL default ''"
-        ],
-        'dateAdded'      => [
-            'label'     => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
-            'default'   => time(),
-            'sorting'   => true,
-            'flag'      => 6,
-            'inputType' => 'text',
-            'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'],
-            'sql'       => "int(10) unsigned NOT NULL default '0'"
-        ]
-    ]
-];
+		'postal'         => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['postal'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 32, 'tl_class' => 'w50'),
+			'sql'       => "varchar(32) NOT NULL default ''"
+		),
+		'city'           => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['city'],
+			'exclude'   => true,
+			'filter'    => true,
+			'search'    => true,
+			'sorting'   => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'state'          => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['state'],
+			'exclude'   => true,
+			'sorting'   => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 64, 'tl_class' => 'w50'),
+			'sql'       => "varchar(64) NOT NULL default ''"
+		),
+		'country'        => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['country'],
+			'exclude'   => true,
+			'filter'    => true,
+			'sorting'   => true,
+			'inputType' => 'select',
+			'options'   => System::getCountries(),
+			'eval'      => array('includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(2) NOT NULL default ''"
+		),
+		'phone'          => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['phone'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(64) NOT NULL default ''"
+		),
+		'mobile'         => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['mobile'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(64) NOT NULL default ''"
+		),
+		'fax'            => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['fax'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(64) NOT NULL default ''"
+		),
+		'email'          => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['email'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => true, 'decodeEntities' => true, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'website'        => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['website'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'ustId'          => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['ustId'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => array('maxlength' => 255, 'tl_class' => 'w50'),
+			'sql'       => "varchar(255) NOT NULL default ''"
+		),
+		'invoiceAddress' => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['invoiceAddress'],
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'textarea',
+			'eval'      => array('decodeEntities' => false, 'tl_class' => 'clr'),
+			'sql'       => "mediumtext NULL"
+		),
+		'assignDir'      => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['assignDir'],
+			'exclude'   => true,
+			'inputType' => 'checkbox',
+			'eval'      => array('submitOnChange' => true),
+			'sql'       => "char(1) NOT NULL default ''"
+		),
+		'disable'        => array(
+			'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['disable'],
+			'exclude'   => true,
+			'filter'    => true,
+			'inputType' => 'checkbox',
+			'sql'       => "char(1) NOT NULL default ''"
+		),
+		'dateAdded'      => array(
+			'label'     => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
+			'default'   => time(),
+			'sorting'   => true,
+			'flag'      => 6,
+			'inputType' => 'text',
+			'eval'      => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'),
+			'sql'       => "int(10) unsigned NOT NULL default '0'"
+		)
+	)
+);
 
 /**
  * Class tl_crm_customer
  */
-class tl_crm_customer extends \Contao\Backend
+class tl_crm_customer extends Backend
 {
+	/**
+	 * tl_crm_customer constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->import('BackendUser', 'User');
+	}
 
-    /**
-     * tl_crm_customer constructor.
-     */
-    public function __construct()
-    {
+	/**
+	 * Add an image to each record
+	 *
+	 * @param array         $row
+	 * @param string        $label
+	 * @param DataContainer $dc
+	 * @param array         $args
+	 *
+	 * @return array
+	 */
+	public function addIcon($row, $label, DataContainer $dc, $args)
+	{
+		$image = 'member';
 
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
+		if ($row['disable'] || $disabled)
+		{
+			$image .= '_';
+		}
 
-    /**
-     * Add an image to each record
-     *
-     * @param array $row
-     * @param string $label
-     * @param \Contao\DataContainer $dc
-     * @param array $args
-     *
-     * @return array
-     */
-    public function addIcon($row, $label, \Contao\DataContainer $dc, $args)
-    {
+		$args[0] = sprintf('<div class="list_icon_new" style="background-image:url(\'%ssystem/themes/%s/images/%s.gif\')" data-icon="%s.gif" data-icon-disabled="%s.gif">&nbsp;</div>', TL_ASSETS_URL, Backend::getTheme(), $image, $disabled ? $image : rtrim($image, '_'), rtrim($image, '_') . '_');
 
-        $image = 'member';
+		return $args;
+	}
 
-        if ($row['disable'] || $disabled)
-        {
-            $image .= '_';
-        }
+	/**
+	 * Store the date when the account has been added
+	 *
+	 * @param DataContainer $dc
+	 */
+	public function storeDateAdded($dc)
+	{
+		// Front end call
+		if (!$dc instanceof DataContainer)
+		{
+			return;
+		}
 
-        $args[0] = sprintf('<div class="list_icon_new" style="background-image:url(\'%ssystem/themes/%s/images/%s.gif\')" data-icon="%s.gif" data-icon-disabled="%s.gif">&nbsp;</div>', TL_ASSETS_URL, Backend::getTheme(), $image, $disabled ? $image : rtrim($image, '_'), rtrim($image, '_') . '_');
+		// Return if there is no active record (override all)
+		if (!$dc->activeRecord || $dc->activeRecord->dateAdded > 0)
+		{
+			return;
+		}
 
-        return $args;
-    }
+		$this->Database->prepare("UPDATE tl_crm_customer SET dateAdded=? WHERE id=?")
+			->execute(time(), $dc->id);
+	}
 
-    /**
-     * Store the date when the account has been added
-     *
-     * @param \Contao\DataContainer $dc
-     */
-    public function storeDateAdded($dc)
-    {
+	/**
+	 * Return the "toggle visibility" button
+	 *
+	 * @param array  $row
+	 * @param string $href
+	 * @param string $label
+	 * @param string $title
+	 * @param string $icon
+	 * @param string $attributes
+	 *
+	 * @return string
+	 */
+	public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
+	{
+		if (strlen(Input::get('tid')))
+		{
+			$this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
+			$this->redirect($this->getReferer());
+		}
 
-        // Front end call
-        if (!$dc instanceof \Contao\DataContainer)
-        {
-            return;
-        }
+		// Check permissions AFTER checking the tid, so hacking attempts are logged
+		if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf'))
+		{
+			return '';
+		}
 
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord || $dc->activeRecord->dateAdded > 0)
-        {
-            return;
-        }
+		$href .= '&amp;tid=' . $row['id'] . '&amp;state=' . $row['disable'];
 
-        $this->Database->prepare("UPDATE tl_crm_customer SET dateAdded=? WHERE id=?")
-            ->execute(time(), $dc->id);
-    }
+		if ($row['disable'])
+		{
+			$icon = 'invisible.gif';
+		}
 
-    /**
-     * Return the "toggle visibility" button
-     *
-     * @param array $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
-     */
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
+		return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . Image::getHtml($icon, $label, 'data-state="' . ($row['disable'] ? 0 : 1) . '"') . '</a> ';
+	}
 
-        if (strlen(\Contao\Input::get('tid')))
-        {
-            $this->toggleVisibility(\Contao\Input::get('tid'), (\Contao\Input::get('state') == 1), (@func_get_arg(12) ?: null));
-            $this->redirect($this->getReferer());
-        }
+	/**
+	 * Disable/enable a user group
+	 *
+	 * @param integer       $intId
+	 * @param boolean       $blnVisible
+	 * @param DataContainer $dc
+	 */
+	public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null)
+	{
+		// Set the ID and action
+		Input::setGet('id', $intId);
+		Input::setGet('act', 'toggle');
 
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf'))
-        {
-            return '';
-        }
+		if ($dc)
+		{
+			$dc->id = $intId; // see #8043
+		}
 
-        $href .= '&amp;tid=' . $row['id'] . '&amp;state=' . $row['disable'];
+		// Check the field access
+		if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf'))
+		{
+			$this->log('Not enough permissions to activate/deactivate member ID "' . $intId . '"', __METHOD__, TL_ERROR);
+			$this->redirect('contao/main.php?act=error');
+		}
 
-        if ($row['disable'])
-        {
-            $icon = 'invisible.gif';
-        }
+		$objVersions = new Versions('tl_crm_customer', $intId);
+		$objVersions->initialize();
 
-        return '<a href="' . $this->addToUrl($href) . '" title="' . specialchars($title) . '"' . $attributes . '>' . \Contao\Image::getHtml($icon, $label, 'data-state="' . ($row['disable'] ? 0 : 1) . '"') . '</a> ';
-    }
+		// Trigger the save_callback
+		if (is_array($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback']))
+		{
+			foreach ($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback'] as $callback)
+			{
+				if (is_array($callback))
+				{
+					$this->import($callback[0]);
+					$blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, ($dc ?: $this));
+				}
+				elseif (is_callable($callback))
+				{
+					$blnVisible = $callback($blnVisible, ($dc ?: $this));
+				}
+			}
+		}
 
-    /**
-     * Disable/enable a user group
-     *
-     * @param integer $intId
-     * @param boolean $blnVisible
-     * @param \Contao\DataContainer $dc
-     */
-    public function toggleVisibility($intId, $blnVisible, \Contao\DataContainer $dc = null)
-    {
+		$time = time();
 
-        // Set the ID and action
-        \Contao\Input::setGet('id', $intId);
-        \Contao\Input::setGet('act', 'toggle');
+		// Update the database
+		$this->Database->prepare("UPDATE tl_crm_customer SET tstamp=$time, disable='" . ($blnVisible ? '' : 1) . "' WHERE id=?")
+			->execute($intId);
 
-        if ($dc)
-        {
-            $dc->id = $intId; // see #8043
-        }
+		$objVersions->create();
 
-        // Check the field access
-        if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf'))
-        {
-            $this->log('Not enough permissions to activate/deactivate member ID "' . $intId . '"', __METHOD__, TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
-        }
+		// Remove the session if the user is disabled (see #5353)
+		if (!$blnVisible)
+		{
+			$this->Database->prepare("DELETE FROM tl_session WHERE name='FE_USER_AUTH' AND pid=?")
+				->execute($intId);
+		}
 
-        $objVersions = new \Contao\Versions('tl_crm_customer', $intId);
-        $objVersions->initialize();
+		// HOOK: update newsletter subscriptions
+		if (in_array('newsletter', ModuleLoader::getActive()))
+		{
+			$objUser = $this->Database->prepare("SELECT email FROM tl_crm_customer WHERE id=?")
+				->limit(1)
+				->execute($intId);
 
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback']))
-        {
-            foreach ($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback'] as $callback)
-            {
-                if (is_array($callback))
-                {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, ($dc ?: $this));
-                }
-                elseif (is_callable($callback))
-                {
-                    $blnVisible = $callback($blnVisible, ($dc ?: $this));
-                }
-            }
-        }
-
-        $time = time();
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_crm_customer SET tstamp=$time, disable='" . ($blnVisible ? '' : 1) . "' WHERE id=?")
-            ->execute($intId);
-
-        $objVersions->create();
-
-        // Remove the session if the user is disabled (see #5353)
-        if (!$blnVisible)
-        {
-            $this->Database->prepare("DELETE FROM tl_session WHERE name='FE_USER_AUTH' AND pid=?")
-                ->execute($intId);
-        }
-
-        // HOOK: update newsletter subscriptions
-        if (in_array('newsletter', ModuleLoader::getActive()))
-        {
-            $objUser = $this->Database->prepare("SELECT email FROM tl_crm_customer WHERE id=?")
-                ->limit(1)
-                ->execute($intId);
-
-            if ($objUser->numRows)
-            {
-                $this->Database->prepare("UPDATE tl_newsletter_recipients SET tstamp=$time, active=? WHERE email=?")
-                    ->execute(($blnVisible ? 1 : ''), $objUser->email);
-            }
-        }
-    }
+			if ($objUser->numRows)
+			{
+				$this->Database->prepare("UPDATE tl_newsletter_recipients SET tstamp=$time, active=? WHERE email=?")
+					->execute(($blnVisible ? 1 : ''), $objUser->email);
+			}
+		}
+	}
 }
