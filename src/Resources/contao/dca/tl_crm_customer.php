@@ -1,22 +1,20 @@
 <?php
 
 /*
- * This file is part of Contao Bundle Creator Bundle.
+ * This file is part of markocupic/contao-crm-bundle.
  *
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * (c) Marko Cupic
+ *
  * @license MIT
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+use Contao\Backend;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\Input;
 use Contao\ModuleLoader;
 use Contao\System;
 use Contao\Versions;
-use Contao\Backend;
 
 /**
  * Table tl_crm_customer

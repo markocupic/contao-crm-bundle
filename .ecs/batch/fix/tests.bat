@@ -6,5 +6,5 @@ cd..
 cd..
 cd..
 cd..
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/tests --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.php
 cd vendor/markocupic/contao-crm-bundle/.ecs./batch/fix

@@ -7,6 +7,6 @@ cd..
 cd..
 cd..
 :: legacy
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao --config vendor/markocupic/contao-crm-bundle/.ecs/config/legacy.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao --config vendor/markocupic/contao-crm-bundle/.ecs/config/legacy.php
 ::
 cd vendor/markocupic/contao-crm-bundle/.ecs./batch/fix

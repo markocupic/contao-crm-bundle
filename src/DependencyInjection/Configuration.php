@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-/**
- * This file is part of a markocupic Contao Bundle.
+/*
+ * This file is part of markocupic/contao-crm-bundle.
  *
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
- * @author     Marko Cupic
- * @package    Contao CRM Bundle
- * @license    MIT
- * @see        https://github.com/markocupic/contao-crm-bundle
+ * (c) Marko Cupic
  *
+ * @license MIT
  */
 
 namespace Markocupic\ContaoCrmBundle\DependencyInjection;
@@ -20,7 +17,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('markocupic_contao_crm');
@@ -46,6 +42,4 @@ class Configuration implements ConfigurationInterface
 
         return $treeBuilder;
     }
-
-
 }

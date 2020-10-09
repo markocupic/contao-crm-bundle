@@ -1,37 +1,35 @@
 <?php
 
-/**
- * This file is part of a markocupic Contao Bundle.
+/*
+ * This file is part of markocupic/contao-crm-bundle.
  *
- * (c) Marko Cupic 2020 <m.cupic@gmx.ch>
+ * (c) Marko Cupic
  *
- * @author     Marko Cupic
- * @package    Contao CRM Bundle
- * @license    MIT
- * @see        https://github.com/markocupic/contao-crm-bundle
- *
+ * @license MIT
  */
+
+use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
+use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 
 if (TL_MODE == 'BE')
 {
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupiccontaocrm/css/markocupic_crm_be.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaocrm/js/markocupic_crm_be.js';
+	$GLOBALS['TL_CSS'][] = 'bundles/markocupiccontaocrm/css/markocupic_crm_be.css';
+	$GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaocrm/js/markocupic_crm_be.js';
 }
 
 /**
  * Backend modules
  */
-$GLOBALS['BE_MOD']['crm']['customer'] = [
+$GLOBALS['BE_MOD']['crm']['customer'] = array(
+	'tables' => array('tl_crm_customer'),
+);
 
-    'tables' => ['tl_crm_customer'],
-];
-
-$GLOBALS['BE_MOD']['crm']['service'] = [
-    'tables' => ['tl_crm_service'],
-];
+$GLOBALS['BE_MOD']['crm']['service'] = array(
+	'tables' => array('tl_crm_service'),
+);
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_crm_customer'] = \Markocupic\ContaoCrmBundle\Model\CrmCustomerModel::class;
-$GLOBALS['TL_MODELS']['tl_crm_service'] = \Markocupic\ContaoCrmBundle\Model\CrmServiceModel::class;
+$GLOBALS['TL_MODELS']['tl_crm_customer'] = CrmCustomerModel::class;
+$GLOBALS['TL_MODELS']['tl_crm_service'] = CrmServiceModel::class;

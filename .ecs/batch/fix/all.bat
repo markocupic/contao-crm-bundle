@@ -7,12 +7,12 @@ cd..
 cd..
 cd..
 :: src
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.php
 :: tests
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/tests --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/tests --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.php
 :: legacy
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/legacy.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/legacy.php
 :: templates
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/template.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates --fix --config vendor/markocupic/contao-crm-bundle/.ecs/config/template.php
 ::
 cd vendor/markocupic/contao-crm-bundle/.ecs./batch/fix

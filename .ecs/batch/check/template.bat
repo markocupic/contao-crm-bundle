@@ -7,6 +7,6 @@ cd..
 cd..
 cd..
 :: templates
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates --config vendor/markocupic/contao-crm-bundle/.ecs/config/template.yaml
+vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates --config vendor/markocupic/contao-crm-bundle/.ecs/config/template.php
 ::
 cd vendor/markocupic/contao-crm-bundle/.ecs./batch/fix
