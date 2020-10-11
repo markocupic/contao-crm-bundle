@@ -36,7 +36,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = array(
 			),
 		),
 	),
-
 	// List
 	'list'        => array(
 		'sorting'           => array(
@@ -94,7 +93,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = array(
 			),
 		),
 	),
-
 	// Palettes
 	'palettes'    => array(
 		'__selector__' => array('paid'),
@@ -102,10 +100,8 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = array(
                         {invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;
                         {state_legend},paid',
 	),
-
 	// Subpalettes
 	'subpalettes' => array('paid' => 'amountReceivedDate'),
-
 	// Fields
 	'fields'      => array(
 		'id'                     => array(
@@ -335,7 +331,7 @@ class tl_crm_service extends Backend
     <div class="list-service-row-2">%s</div>
     <div class="list-service-row-3">%s: %s</div>
     <div class="list-service-row-4">%s: %s</div>
-    <div class="list-service-row-5">%s: %s</div>
+    <div class="list-service-row-5">%s: %s %s (%s %s)</div>
     <div class="list-service-row-6">%s: %s %s</div>
 </div>';
 
@@ -356,6 +352,7 @@ class tl_crm_service extends Backend
 		$servicePositions = StringUtil::deserialize($arrRow['servicePositions'], true);
 		$quantity = 0;
 		$unit = '';
+		$price = 0;
 
 		if (count($servicePositions))
 		{
@@ -366,10 +363,15 @@ class tl_crm_service extends Backend
 					$quantity += $service['quantity'];
 				}
 
-				if (isset($service['unit']) && !empty($service['unit']))
+				if ($unit === '' && isset($service['unit']) && !empty($service['unit']))
 				{
-					$quantity += (float) $service['unit'];
+					$unit = $service['unit'];
 				}
+
+                if (isset($service['price']) && !empty($service['price']))
+                {
+                    $price += (int) $service['price'];
+                }
 			}
 		}
 
@@ -389,11 +391,14 @@ class tl_crm_service extends Backend
 			str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT),
 			// Row 5
 			$GLOBALS["TL_LANG"]["MSC"]["projectPrice"],
-			$arrRow['price'] . ' ' . $arrRow['currency'],
-			// Row 6
+			$arrRow['price'],
+            $arrRow['currency'],
+            $price,
+            $arrRow['currency'],
+            // Row 6
 			$GLOBALS["TL_LANG"]["MSC"]["expense"],
 			$quantity,
-			$unit
-		);
+			$unit,
+        );
 	}
 }
