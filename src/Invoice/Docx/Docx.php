@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 /*
- * This file is part of markocupic/contao-crm-bundle.
+ * This file is part of Contao Crm Bundle.
  *
- * (c) Marko Cupic
- *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-crm-bundle
  */
 
 namespace Markocupic\ContaoCrmBundle\Invoice\Docx;
@@ -197,10 +199,10 @@ class Docx
         $this->tags['tags']['h'] = [$objService->price, ['multiline' => false]];
 
         // Invoice text
-        if ('' !== $objService->alternativeInvoiceText) {
+        if (!empty($objService->alternativeInvoiceText)) {
             $this->tags['tags']['invoiceText'] = [$objService->alternativeInvoiceText, ['multiline' => true]];
         } else {
-            $this->tags['tags']['invoiceText'] = [$objService->defautInvoiceText, ['multiline' => true]];
+            $this->tags['tags']['invoiceText'] = [$objService->defaultInvoiceText, ['multiline' => true]];
         }
     }
 

@@ -1,11 +1,13 @@
 <?php
 
 /*
- * This file is part of markocupic/contao-crm-bundle.
+ * This file is part of Contao Crm Bundle.
  *
- * (c) Marko Cupic
- *
+ * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
  * @license MIT
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-crm-bundle
  */
 
 use Contao\Backend;
@@ -368,10 +370,10 @@ class tl_crm_service extends Backend
 					$unit = $service['unit'];
 				}
 
-                if (isset($service['price']) && !empty($service['price']))
-                {
-                    $price += (int) $service['price'];
-                }
+				if (isset($service['price']) && !empty($service['price']))
+				{
+					$price += (int) $service['price'];
+				}
 			}
 		}
 
@@ -392,13 +394,13 @@ class tl_crm_service extends Backend
 			// Row 5
 			$GLOBALS["TL_LANG"]["MSC"]["projectPrice"],
 			$arrRow['price'],
-            $arrRow['currency'],
-            $price,
-            $arrRow['currency'],
-            // Row 6
+			$arrRow['currency'],
+			$price,
+			$arrRow['currency'],
+			// Row 6
 			$GLOBALS["TL_LANG"]["MSC"]["expense"],
 			$quantity,
 			$unit,
-        );
+		);
 	}
 }

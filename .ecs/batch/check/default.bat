@@ -6,9 +6,5 @@ cd..
 cd..
 cd..
 cd..
-:: src
 vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/src --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.php
-:: tests
-vendor\bin\ecs check vendor/markocupic/contao-crm-bundle/tests --config vendor/markocupic/contao-crm-bundle/.ecs/config/default.php
-::
-cd vendor/markocupic/contao-crm-bundle/.ecs./batch/fix
+cd vendor/markocupic/contao-crm-bundle/.ecs./batch/check
