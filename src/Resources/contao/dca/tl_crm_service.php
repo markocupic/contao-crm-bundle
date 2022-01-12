@@ -459,7 +459,7 @@ class tl_crm_service extends Backend
         if (empty(
         System::getContainer(
         )->getParameter(
-            'markocupic_contao_crm.cloudconvert_api_key'
+            'markocupic_cloudconvert.api_key'
         )
         )) {
             Message::addInfo(
