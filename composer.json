@@ -22,9 +22,9 @@
   },
   "require": {
     "contao/core-bundle": "^4.9",
-    "cloudconvert/cloudconvert-php": "2.2.*",
     "phpoffice/phpword": "^0.16",
     "markocupic/phpoffice-bundle": "^1.0",
+    "markocupic/cloudconvert-bundle": "^2.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.5"
   },
   "require-dev": {
