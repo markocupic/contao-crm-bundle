@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Contao Crm Bundle.
+ * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-crm-bundle
@@ -14,17 +14,14 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoCrmBundle\Invoice;
 
-use CloudConvert\Exceptions\ApiException;
-use CloudConvert\Exceptions\InvalidParameterException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
 use Contao\File;
 use Contao\FilesModel;
 use Contao\System;
 use Contao\Validator;
-use GuzzleHttp\Exception\GuzzleException;
+use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\ContaoCrmBundle\Invoice\Docx\Docx;
-use Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
@@ -36,49 +33,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class Generator
 {
-    /**
-     * @var ContaoFramework
-     */
-    protected $framework;
-
-    /**
-     * @var Docx
-     */
-    protected $docx;
-
-    /**
-     * @var Pdf
-     */
-    protected $pdf;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var string
-     */
-    protected $projectDir;
-
-    /**
-     * @var string
-     */
-    protected $docxInvoiceTemplate;
-
-    /**
-     * @var string
-     */
-    protected $tempDir;
+    protected ContaoFramework $framework;
+    protected Docx $docx;
+    protected ConvertFile $convertFile;
+    protected TranslatorInterface $translator;
+    protected string $projectDir;
+    protected string $docxInvoiceTemplate;
+    protected string $tempDir;
 
     /**
      * Generator constructor.
      */
-    public function __construct(ContaoFramework $framework, Docx $docx, Pdf $pdf, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
+    public function __construct(ContaoFramework $framework, Docx $docx, ConvertFile $convertFile, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
     {
         $this->framework = $framework;
         $this->docx = $docx;
-        $this->pdf = $pdf;
+        $this->convertFile = $convertFile;
         $this->translator = $translator;
         $this->projectDir = $projectDir;
         $this->docxInvoiceTemplate = $docxInvoiceTemplate;
@@ -88,15 +58,15 @@ class Generator
     /**
      * Generate the invoice from a docx template.
      *
-     * @throws ApiException
-     * @throws InvalidParameterException
-     * @throws GuzzleException
+     * @param CrmServiceModel $objService
+     * @param string $format
+     * @return void
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
     public function generateInvoice(CrmServiceModel $objService, string $format = 'docx'): void
     {
-        /** @var $crmCustomerModelAdapter */
+        /** @var CrmCustomerModel $crmCustomerModelAdapter */
         $crmCustomerModelAdapter = $this->framework->getAdapter(CrmCustomerModel::class);
 
         /** @var Validator $validatorAdapter */
@@ -118,7 +88,7 @@ class Generator
         $objCustomer = $crmCustomerModelAdapter->findByPk($objService->toCustomer);
 
         if (null === $objCustomer) {
-            throw new \Exception(sprintf('Datarecord tl_crm_customer with ID %s is null.', $objService->toCustomer));
+            throw new \Exception(sprintf('Data record tl_crm_customer with ID %s is null.', $objService->toCustomer));
         }
 
         // Get the template path
@@ -136,7 +106,7 @@ class Generator
             '%s_%s_%s_%s.docx',
             $type,
             $dateAdapter->parse('Ymd', $objService->invoiceDate),
-            str_pad($objService->id, 7, '0', STR_PAD_LEFT),
+            str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT),
             str_replace(' ', '-', $objCustomer->company)
         );
 
@@ -144,29 +114,25 @@ class Generator
 
         $objFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
 
-        if ($objFile instanceof File) {
-            if ('pdf' === $format) {
-                $this->sendPdfToBrowser($objFile);
-            } else {
-                $objFile->sendToBrowser();
-            }
+        if ('pdf' === $format) {
+            $this->sendPdfToBrowser($objFile);
+        } else {
+            $objFile->sendToBrowser();
         }
     }
 
     /**
      * Convert docx to pdf.
      *
-     * @throws ApiException
-     * @throws InvalidParameterException
-     * @throws GuzzleException
+     * @throws \Exception
      */
     protected function sendPdfToBrowser(File $objFile): void
     {
-        $objFile = $this->pdf->generate($objFile);
-
-        if ($objFile instanceof File) {
-            $objFile->sendToBrowser();
-        }
+        $this->convertFile
+            ->file($this->projectDir.'/'.$objFile->path)
+            ->sendToBrowser(true, true)
+            ->convertTo('pdf')
+        ;
     }
 
     protected function prepareString(string $string = ''): string
@@ -175,6 +141,6 @@ class Generator
             return '';
         }
 
-        return htmlspecialchars(html_entity_decode((string) $string));
+        return htmlspecialchars(html_entity_decode($string));
     }
 }

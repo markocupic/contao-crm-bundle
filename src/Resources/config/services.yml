@@ -4,7 +4,7 @@ services:
     arguments:
       - '@contao.framework'
       - '@Markocupic\ContaoCrmBundle\Invoice\Docx\Docx'
-      - '@Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf'
+      - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
       - '@translator'
       - '%kernel.project_dir%'
       - '%markocupic_contao_crm.docx_invoice_template%'
@@ -18,8 +18,3 @@ services:
       - '%kernel.project_dir%'
     public: true
 
-  Markocupic\ContaoCrmBundle\Invoice\Pdf\Pdf:
-    arguments:
-      - '%kernel.project_dir%'
-      - '%markocupic_contao_crm.cloudconvert_api_key%'
-    public: true
