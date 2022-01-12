@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 /*
- * This file is part of Contao Crm Bundle.
+ * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-crm-bundle
@@ -151,7 +151,7 @@ class Docx
         $projectId = sprintf(
             '%s: %s',
             $this->translator->trans('MSC.projectId', [], 'contao_default'),
-            str_pad($objService->id, 7, '0', STR_PAD_LEFT)
+            str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT)
         );
         $this->tags['tags']['projectId'] = [$projectId, ['multiline' => false]];
 
@@ -174,7 +174,7 @@ class Docx
         $customerId = sprintf(
             '%s: %s',
             $this->translator->trans('MSC.customerId', [], 'contao_default'),
-            str_pad($objCustomer->id, 7, '0', STR_PAD_LEFT)
+            str_pad((string) $objCustomer->id, 7, '0', STR_PAD_LEFT)
         );
         $this->tags['tags']['customerId'] = [$customerId, ['multiline' => false]];
 

@@ -21,8 +21,8 @@
     "source": "https://github.com/markocupic/contao-crm-bundle"
   },
   "require": {
-    "contao/core-bundle": "^4.9",
-    "phpoffice/phpword": "^0.16",
+    "php": "^7.4|^8.0",
+    "contao/core-bundle": "^4.12",
     "markocupic/phpoffice-bundle": "^1.0",
     "markocupic/cloudconvert-bundle": "^2.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.5"
