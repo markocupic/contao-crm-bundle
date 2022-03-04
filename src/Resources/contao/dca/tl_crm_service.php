@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of Contao Crm Bundle.
+ * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2021 <m.cupic@gmx.ch>
- * @license MIT
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-crm-bundle
@@ -21,138 +23,138 @@ use Markocupic\ContaoCrmBundle\Invoice\Generator;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 
-/**
+/*
  * Table tl_crm_service
  */
-$GLOBALS['TL_DCA']['tl_crm_service'] = array(
+$GLOBALS['TL_DCA']['tl_crm_service'] = [
     // Config
-    'config'      => array(
+    'config'      => [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,
-        'onload_callback'  => array(
-            array(
+        'onload_callback'  => [
+            [
                 'tl_crm_service',
                 'checkCloudConvertApiKey',
-            ),
-        ),
-        'sql'              => array(
-            'keys' => array(
+            ],
+        ],
+        'sql'              => [
+            'keys' => [
                 'id' => 'primary',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
     // List
-    'list'        => array(
-        'sorting'           => array(
+    'list'        => [
+        'sorting'           => [
             'mode'               => 1,
-            'fields'             => array('projectDateStart'),
+            'fields'             => ['projectDateStart'],
             'flag'               => 8,
             'panelLayout'        => 'filter;sort,search,limit',
             'child_record_class' => 'no_padding',
-        ),
-        'label'             => array(
-            'fields'         => array(
+        ],
+        'label'             => [
+            'fields'         => [
                 'invoiceNumber',
                 'toCustomer',
                 'title',
-            ),
-            'label_callback' => array(
+            ],
+            'label_callback' => [
                 'tl_crm_service',
                 'listServices',
-            ),
-        ),
-        'global_operations' => array(
-            'all' => array(
+            ],
+        ],
+        'global_operations' => [
+            'all' => [
                 'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset();"',
-            ),
-        ),
-        'operations'        => array(
-            'edit'                => array(
+            ],
+        ],
+        'operations'        => [
+            'edit'                => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['edit'],
                 'href'  => 'act=edit',
                 'icon'  => 'edit.gif',
-            ),
-            'copy'                => array(
+            ],
+            'copy'                => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['copy'],
                 'href'  => 'act=copy',
                 'icon'  => 'copy.gif',
-            ),
-            'delete'              => array(
+            ],
+            'delete'              => [
                 'label'      => &$GLOBALS['TL_LANG']['tl_crm_service']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
                 'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
-            ),
-            'show'                => array(
+            ],
+            'show'                => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['show'],
                 'href'  => 'act=show',
                 'icon'  => 'show.gif',
-            ),
-            'generateInvoiceDocx' => array(
+            ],
+            'generateInvoiceDocx' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
                 'href'            => 'action=generateInvoice&type=docx',
-                'button_callback' => array(
+                'button_callback' => [
                     'tl_crm_service',
                     'generateInvoice',
-                ),
+                ],
                 'icon'            => 'bundles/markocupiccontaocrm/images/docx.svg',
-            ),
-            'generateInvoicePdf'  => array(
+            ],
+            'generateInvoicePdf'  => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
                 'href'            => 'action=generateInvoice&type=pdf',
-                'button_callback' => array(
+                'button_callback' => [
                     'tl_crm_service',
                     'generateInvoice',
-                ),
+                ],
                 'icon'            => 'bundles/markocupiccontaocrm/images/pdf.svg',
-            ),
-        ),
-    ),
+            ],
+        ],
+    ],
     // Palettes
-    'palettes'    => array(
-        '__selector__' => array('paid'),
+    'palettes'    => [
+        '__selector__' => ['paid'],
         'default'      => '{service_legend},title,projectDateStart,toCustomer,description,servicePositions;
                         {invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;
                         {state_legend},paid',
-    ),
+    ],
     // Subpalettes
-    'subpalettes' => array('paid' => 'amountReceivedDate'),
+    'subpalettes' => ['paid' => 'amountReceivedDate'],
     // Fields
-    'fields'      => array(
-        'id'                     => array(
-            'sql' => "int(10) unsigned NOT NULL auto_increment",
-        ),
-        'tstamp'                 => array(
+    'fields'      => [
+        'id'                     => [
+            'sql' => 'int(10) unsigned NOT NULL auto_increment',
+        ],
+        'tstamp'                 => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
-        ),
-        'title'                  => array(
+        ],
+        'title'                  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['title'],
             'inputType' => 'text',
             'exclude'   => true,
-            'eval'      => array(
+            'eval'      => [
                 'mandatory' => true,
                 'maxlength' => 250,
                 'tl_class'  => 'clr',
-            ),
+            ],
             'sql'       => "varchar(255) NOT NULL default ''",
-        ),
-        'projectDateStart'       => array(
+        ],
+        'projectDateStart'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['projectDateStart'],
             'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => array(
+            'eval'      => [
                 'mandatory'  => true,
                 'rgxp'       => 'date',
                 'datepicker' => true,
                 'tl_class'   => 'clr wizard',
-            ),
+            ],
             'sql'       => "varchar(10) NOT NULL default ''",
-        ),
-        'toCustomer'             => array(
+        ],
+        'toCustomer'             => [
             'label'      => &$GLOBALS['TL_LANG']['tl_crm_service']['toCustomer'],
             'inputType'  => 'select',
             'sorting'    => true,
@@ -160,222 +162,222 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = array(
             'search'     => true,
             'exclude'    => true,
             'foreignKey' => 'tl_crm_customer.company',
-            'eval'       => array(
+            'eval'       => [
                 'multiple' => false,
                 'tl_class' => 'clr',
-            ),
-            'sql'        => "blob NULL",
-            'relation'   => array(
+            ],
+            'sql'        => 'blob NULL',
+            'relation'   => [
                 'type' => 'belongsTo',
                 'load' => 'lazy',
-            ),
-        ),
-        'description'            => array(
+            ],
+        ],
+        'description'            => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['description'],
             'inputType' => 'textarea',
             'exclude'   => true,
-            'eval'      => array(
+            'eval'      => [
                 'decodeEntities' => false,
                 'tl_class'       => 'clr',
-            ),
-            'sql'       => "mediumtext NULL",
-        ),
-        'servicePositions'       => array(
+            ],
+            'sql'       => 'mediumtext NULL',
+        ],
+        'servicePositions'       => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['servicePositions'],
             'inputType' => 'multiColumnWizard',
             'exclude'   => true,
-            'eval'      => array(
-                'columnFields' => array(
-                    'item'     => array(
+            'eval'      => [
+                'columnFields' => [
+                    'item'     => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_item'],
                         'exclude'   => true,
                         'inputType' => 'textarea',
-                        'eval'      => array('style' => 'width:95%;'),
-                    ),
-                    'quantity' => array(
+                        'eval'      => ['style' => 'width:95%;'],
+                    ],
+                    'quantity' => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_quantity'],
                         'exclude'   => true,
                         'inputType' => 'select',
                         'options'   => range(0.25, 50, 0.25),
-                        'eval'      => array(
+                        'eval'      => [
                             'style'  => 'width:50px;',
                             'chosen' => true,
-                        ),
-                    ),
-                    'unit'     => array(
+                        ],
+                    ],
+                    'unit'     => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_unit'],
                         'exclude'   => true,
                         'inputType' => 'select',
-                        'options'   => array(
+                        'options'   => [
                             'h',
                             'Mt.',
                             'Stk.',
-                        ),
-                        'eval'      => array(
+                        ],
+                        'eval'      => [
                             'style'  => 'width:50px;',
                             'chosen' => true,
-                        ),
-                    ),
-                    'price'    => array(
+                        ],
+                    ],
+                    'price'    => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_price'],
                         'exclude'   => true,
                         'inputType' => 'text',
-                        'eval'      => array(
+                        'eval'      => [
                             'rgxp'  => 'natural',
                             'style' => 'width:50px;text-align:center;',
-                        ),
-                    ),
-                ),
-            ),
-            'sql'       => "blob NULL",
-        ),
-        'price'                  => array(
+                        ],
+                    ],
+                ],
+            ],
+            'sql'       => 'blob NULL',
+        ],
+        'price'                  => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['price'],
             'inputType' => 'text',
             'exclude'   => true,
-            'eval'      => array(
+            'eval'      => [
                 'mandatory'  => true,
                 'maxlength'  => 12,
                 'tl_class'   => 'clr',
                 'rgxp'       => 'natural',
                 'alwaysSave' => true,
-            ),
+            ],
             'sql'       => "double NOT NULL default '0'",
-        ),
-        'currency'               => array(
+        ],
+        'currency'               => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['currency'],
             'inputType' => 'select',
             'exclude'   => true,
-            'options'   => array(
+            'options'   => [
                 'EUR',
                 'CHF',
-            ),
-            'eval'      => array(
+            ],
+            'eval'      => [
                 'mandatory' => true,
                 'chosen'    => true,
                 'tl_class'  => 'clr',
-            ),
+            ],
             'sql'       => "varchar(3) NOT NULL default ''",
-        ),
-        'invoiceType'            => array(
+        ],
+        'invoiceType'            => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceType'],
             'sorting'   => true,
             'filter'    => true,
             'search'    => true,
             'exclude'   => true,
             'reference' => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'],
-            'options'   => array(
+            'options'   => [
                 'calculation',
                 'invoiceNotDelivered',
                 'invoiceDelivered',
-            ),
+            ],
             'inputType' => 'select',
-            'eval'      => array('tl_class' => 'w50 wizard'),
+            'eval'      => ['tl_class' => 'w50 wizard'],
             'sql'       => "varchar(128) NOT NULL default ''",
-        ),
-        'invoiceDate'            => array(
+        ],
+        'invoiceDate'            => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceDate'],
             'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => array(
+            'eval'      => [
                 'rgxp'       => 'date',
                 'datepicker' => true,
                 'tl_class'   => 'clr wizard',
-            ),
+            ],
             'sql'       => "varchar(10) NOT NULL default ''",
-        ),
-        'invoiceNumber'          => array(
+        ],
+        'invoiceNumber'          => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceNumber'],
             'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
             'default'   => 'XXXX-'.Date::parse('m/Y'),
-            'eval'      => array('tl_class' => 'clr'),
+            'eval'      => ['tl_class' => 'clr'],
             'sql'       => "varchar(128) NOT NULL default ''",
-        ),
-        'defaultInvoiceText'     => array(
+        ],
+        'defaultInvoiceText'     => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['defaultInvoiceText'],
             'inputType' => 'textarea',
             'exclude'   => true,
             'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.'.chr(10).chr(10).'Mit besten Grüßen'.chr(10).chr(10).'Marko Cupic',
-            'eval'      => array(
+            'eval'      => [
                 'decodeEntities' => false,
                 'tl_class'       => 'clr',
-            ),
-            'sql'       => "mediumtext NULL",
-        ),
-        'alternativeInvoiceText' => array(
+            ],
+            'sql'       => 'mediumtext NULL',
+        ],
+        'alternativeInvoiceText' => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['alternativeInvoiceText'],
             'inputType' => 'textarea',
             'exclude'   => true,
-            'eval'      => array(
+            'eval'      => [
                 'decodeEntities' => false,
                 'tl_class'       => 'clr',
-            ),
-            'sql'       => "mediumtext NULL",
-        ),
-        'crmInvoiceTpl'          => array(
+            ],
+            'sql'       => 'mediumtext NULL',
+        ],
+        'crmInvoiceTpl'          => [
             'label'            => &$GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'],
             'exclude'          => true,
             'inputType'        => 'select',
-            'options_callback' => array(
+            'options_callback' => [
                 'tl_crm_service',
                 'getInvoiceTemplates',
-            ),
-            'eval'             => array(
+            ],
+            'eval'             => [
                 'includeBlankOption' => true,
                 'chosen'             => true,
                 'tl_class'           => 'clr',
-            ),
+            ],
             'sql'              => "varchar(64) NOT NULL default ''",
-        ),
-        'crmInvoiceTpl'          => array(
+        ],
+        'crmInvoiceTpl'          => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'],
             'exclude'   => true,
             'inputType' => 'fileTree',
-            'eval'      => array(
+            'eval'      => [
                 'filesOnly'  => true,
                 'extensions' => 'docx',
                 'fieldType'  => 'radio',
                 'mandatory'  => false,
                 'tl_class'   => 'clr',
-            ),
-            'sql'       => "binary(16) NULL",
-        ),
-        'paid'                   => array(
+            ],
+            'sql'       => 'binary(16) NULL',
+        ],
+        'paid'                   => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['paid'],
             'inputType' => 'checkbox',
             'exclude'   => true,
             'filter'    => true,
-            'eval'      => array(
+            'eval'      => [
                 'submitOnChange' => true,
                 'tl_class'       => 'clr',
-            ),
+            ],
             'sql'       => "char(1) NOT NULL default ''",
-        ),
-        'amountReceivedDate'     => array(
+        ],
+        'amountReceivedDate'     => [
             'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['amountReceivedDate'],
             'exclude'   => true,
             'inputType' => 'text',
-            'eval'      => array(
+            'eval'      => [
                 'mandatory'  => true,
                 'rgxp'       => 'date',
                 'datepicker' => true,
                 'tl_class'   => 'clr wizard',
-            ),
+            ],
             'sql'       => "varchar(10) NOT NULL default ''",
-        ),
-    ),
-);
+        ],
+    ],
+];
 
 /**
- * Class tl_crm_service
+ * Class tl_crm_service.
  */
 class tl_crm_service extends Backend
 {
     /**
-     * Return the print invoice button
+     * Return the print invoice button.
      *
      * @param array $row
      * @param string $href
@@ -386,8 +388,9 @@ class tl_crm_service extends Backend
      *
      * @return string
      */
-    public function generateInvoice($row, $href, $label, $title, $icon, $attributes) {
-        if (Input::get('action') === 'generateInvoice' && Input::get('id') && Input::get('type')) {
+    public function generateInvoice($row, $href, $label, $title, $icon, $attributes)
+    {
+        if ('generateInvoice' === Input::get('action') && Input::get('id') && Input::get('type')) {
             $type = Input::get('type');
 
             if (null !== ($objInvoice = CrmServiceModel::findByPk(Input::get('id')))) {
@@ -400,22 +403,24 @@ class tl_crm_service extends Backend
     }
 
     /**
-     * Check Cloudconvert API key
+     * Check Cloudconvert API key.
      */
-    public function checkCloudConvertApiKey() {
+    public function checkCloudConvertApiKey(): void
+    {
         if (empty(System::getContainer()->getParameter('markocupic_contao_crm.cloudconvert_api_key'))) {
             Message::addInfo('Please read the README.md in vendor/markocupic/contao-crm-bundle and add your Cloudconvert API key in config/config.yml for downloading pdf invoices.');
         }
     }
 
     /**
-     * Add the type of input field
+     * Add the type of input field.
      *
      * @param array $arrRow
      *
      * @return string
      */
-    public function listServices($arrRow) {
+    public function listServices($arrRow)
+    {
         $strService = '
 <div class="tl_content_left %s" title="%s">
     <div class="list-service-row-1">%s</div>
@@ -426,7 +431,7 @@ class tl_crm_service extends Backend
     <div class="list-service-row-6">%s: %s %s</div>
 </div>';
 
-        if ($arrRow['invoiceType'] == 'invoiceDelivered') {
+        if ('invoiceDelivered' === $arrRow['invoiceType']) {
             $class = ' invoiceDelivered';
         }
 
@@ -449,7 +454,7 @@ class tl_crm_service extends Backend
                     $quantity += $service['quantity'];
                 }
 
-                if ($unit === '' && isset($service['unit']) && !empty($service['unit'])) {
+                if ('' === $unit && isset($service['unit']) && !empty($service['unit'])) {
                     $unit = $service['unit'];
                 }
 
@@ -468,19 +473,19 @@ class tl_crm_service extends Backend
             // Row 2
             $arrRow['title'],
             // Row 3
-            $GLOBALS["TL_LANG"]["MSC"]["invoiceNumber"],
+            $GLOBALS['TL_LANG']['MSC']['invoiceNumber'],
             $arrRow['invoiceNumber'],
             // Row 4
-            $GLOBALS["TL_LANG"]["MSC"]["projectId"],
+            $GLOBALS['TL_LANG']['MSC']['projectId'],
             str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT),
             // Row 5
-            $GLOBALS["TL_LANG"]["MSC"]["projectPrice"],
+            $GLOBALS['TL_LANG']['MSC']['projectPrice'],
             $arrRow['price'],
             $arrRow['currency'],
             $price,
             $arrRow['currency'],
             // Row 6
-            $GLOBALS["TL_LANG"]["MSC"]["expense"],
+            $GLOBALS['TL_LANG']['MSC']['expense'],
             $quantity,
             $unit,
         );
