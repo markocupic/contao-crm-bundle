@@ -26,6 +26,7 @@ use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use function Safe\preg_replace;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -58,9 +59,6 @@ class Generator
     /**
      * Generate the invoice from a docx template.
      *
-     * @param CrmServiceModel $objService
-     * @param string $format
-     * @return void
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
      */
@@ -103,12 +101,15 @@ class Generator
         // Generate filename
         $type = $this->translator->trans('tl_crm_service.invoiceTypeReference.'.$objService->invoiceType.'.1', [], 'contao_default');
         $filename = sprintf(
-            '%s_%s_%s_%s.docx',
+            '%s_%s_%s_%s',
             $type,
             $dateAdapter->parse('Ymd', $objService->invoiceDate),
             str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT),
-            str_replace(' ', '-', $objCustomer->company)
+            $objCustomer->company
         );
+
+        $filename = preg_replace('/[^a-zA-Z0-9_-]/', '_', $filename);
+        $filename = preg_replace('/[_]{2,}/', '_', $filename).'.docx';
 
         $destinationSrc = $this->tempDir.'/'.$filename;
 

@@ -16,7 +16,7 @@ use Contao\Backend;
 use Contao\DataContainer;
 use Contao\Image;
 use Contao\Input;
-use Contao\ModuleLoader;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\Versions;
 
@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
                 'label'      => &$GLOBALS['TL_LANG']['tl_crm_customer']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
             ],
             'toggle' => [
                 'label'           => &$GLOBALS['TL_LANG']['tl_crm_customer']['toggle'],
@@ -118,14 +118,13 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 
     // Fields
     'fields'      => [
-        'id'        => [
+        'id'             => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
         ],
-        'tstamp'    => [
+        'tstamp'         => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'firstname' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['firstname'],
+        'firstname'      => [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
@@ -138,8 +137,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'lastname'  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['lastname'],
+        'lastname'       => [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
@@ -152,8 +150,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'gender'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['gender'],
+        'gender'         => [
             'exclude'   => true,
             'inputType' => 'select',
             'options'   => [
@@ -167,8 +164,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
-        'company'   => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['company'],
+        'company'        => [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
@@ -180,8 +176,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-        'street'    => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['street'],
+        'street'         => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -191,9 +186,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
-
         'postal'         => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['postal'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -204,7 +197,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'city'           => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['city'],
             'exclude'   => true,
             'filter'    => true,
             'search'    => true,
@@ -217,7 +209,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'state'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['state'],
             'exclude'   => true,
             'sorting'   => true,
             'inputType' => 'text',
@@ -228,7 +219,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'country'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['country'],
             'exclude'   => true,
             'filter'    => true,
             'sorting'   => true,
@@ -242,7 +232,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(2) NOT NULL default ''",
         ],
         'phone'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['phone'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -255,7 +244,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'mobile'         => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['mobile'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -268,7 +256,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'fax'            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['fax'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -281,7 +268,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'email'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['email'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -296,7 +282,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'website'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['website'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -308,7 +293,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'ustId'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['ustId'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
@@ -319,7 +303,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'invoiceAddress' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['invoiceAddress'],
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'textarea',
@@ -330,21 +313,18 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sql'       => 'mediumtext NULL',
         ],
         'assignDir'      => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['assignDir'],
             'exclude'   => true,
             'inputType' => 'checkbox',
             'eval'      => ['submitOnChange' => true],
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'disable'        => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_customer']['disable'],
             'exclude'   => true,
             'filter'    => true,
             'inputType' => 'checkbox',
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'dateAdded'      => [
-            'label'     => &$GLOBALS['TL_LANG']['MSC']['dateAdded'],
             'default'   => time(),
             'sorting'   => true,
             'flag'      => 6,
@@ -412,7 +392,7 @@ class tl_crm_customer extends Backend
             return;
         }
 
-        $this->Database->prepare('UPDATE tl_crm_customer SET dateAdded=? WHERE id=?')
+        $this->Database->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
             ->execute(time(), $dc->id);
     }
 
@@ -446,7 +426,7 @@ class tl_crm_customer extends Backend
             $icon = 'invisible.gif';
         }
 
-        return '<a href="'.$this->addToUrl($href).'" title="'.specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label, 'data-state="'.($row['disable'] ? 0 : 1).'"').'</a> ';
+        return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label, 'data-state="'.($row['disable'] ? 0 : 1).'"').'</a> ';
     }
 
     /**
@@ -495,22 +475,5 @@ class tl_crm_customer extends Backend
 
         $objVersions->create();
 
-        // Remove the session if the user is disabled (see #5353)
-        if (!$blnVisible) {
-            $this->Database->prepare("DELETE FROM tl_session WHERE name='FE_USER_AUTH' AND pid=?")
-                ->execute($intId);
-        }
-
-        // HOOK: update newsletter subscriptions
-        if (in_array('newsletter', ModuleLoader::getActive(), true)) {
-            $objUser = $this->Database->prepare('SELECT email FROM tl_crm_customer WHERE id=?')
-                ->limit(1)
-                ->execute($intId);
-
-            if ($objUser->numRows) {
-                $this->Database->prepare("UPDATE tl_newsletter_recipients SET tstamp=$time, active=? WHERE email=?")
-                    ->execute(($blnVisible ? 1 : ''), $objUser->email);
-            }
-        }
     }
 }

@@ -86,7 +86,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                 'label'      => &$GLOBALS['TL_LANG']['tl_crm_service']['delete'],
                 'href'       => 'act=delete',
                 'icon'       => 'delete.gif',
-                'attributes' => 'onclick="if (!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\')) return false; Backend.getScrollOffset();"',
+                'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
             ],
             'show'                => [
                 'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['show'],
@@ -116,9 +116,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
     // Palettes
     'palettes'    => [
         '__selector__' => ['paid'],
-        'default'      => '{service_legend},title,projectDateStart,toCustomer,description,servicePositions;
-                        {invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;
-                        {state_legend},paid',
+        'default'      => '{service_legend},title,projectDateStart,toCustomer,description,servicePositions;{invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;{state_legend},paid',
     ],
     // Subpalettes
     'subpalettes' => ['paid' => 'amountReceivedDate'],
@@ -131,7 +129,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'title'                  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['title'],
             'inputType' => 'text',
             'exclude'   => true,
             'eval'      => [
@@ -142,7 +139,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'projectDateStart'       => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['projectDateStart'],
             'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
@@ -155,7 +151,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(10) NOT NULL default ''",
         ],
         'toCustomer'             => [
-            'label'      => &$GLOBALS['TL_LANG']['tl_crm_service']['toCustomer'],
             'inputType'  => 'select',
             'sorting'    => true,
             'filter'     => true,
@@ -173,7 +168,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             ],
         ],
         'description'            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['description'],
             'inputType' => 'textarea',
             'exclude'   => true,
             'eval'      => [
@@ -183,7 +177,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => 'mediumtext NULL',
         ],
         'servicePositions'       => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['servicePositions'],
             'inputType' => 'multiColumnWizard',
             'exclude'   => true,
             'eval'      => [
@@ -232,7 +225,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => 'blob NULL',
         ],
         'price'                  => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['price'],
             'inputType' => 'text',
             'exclude'   => true,
             'eval'      => [
@@ -245,7 +237,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "double NOT NULL default '0'",
         ],
         'currency'               => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['currency'],
             'inputType' => 'select',
             'exclude'   => true,
             'options'   => [
@@ -260,7 +251,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(3) NOT NULL default ''",
         ],
         'invoiceType'            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceType'],
             'sorting'   => true,
             'filter'    => true,
             'search'    => true,
@@ -276,7 +266,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'invoiceDate'            => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceDate'],
             'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
@@ -288,8 +277,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(10) NOT NULL default ''",
         ],
         'invoiceNumber'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceNumber'],
-            'default'   => time(),
             'exclude'   => true,
             'inputType' => 'text',
             'default'   => 'XXXX-'.Date::parse('m/Y'),
@@ -297,7 +284,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'defaultInvoiceText'     => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['defaultInvoiceText'],
             'inputType' => 'textarea',
             'exclude'   => true,
             'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.'.chr(10).chr(10).'Mit besten Grüßen'.chr(10).chr(10).'Marko Cupic',
@@ -308,7 +294,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => 'mediumtext NULL',
         ],
         'alternativeInvoiceText' => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['alternativeInvoiceText'],
             'inputType' => 'textarea',
             'exclude'   => true,
             'eval'      => [
@@ -318,22 +303,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => 'mediumtext NULL',
         ],
         'crmInvoiceTpl'          => [
-            'label'            => &$GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'],
-            'exclude'          => true,
-            'inputType'        => 'select',
-            'options_callback' => [
-                'tl_crm_service',
-                'getInvoiceTemplates',
-            ],
-            'eval'             => [
-                'includeBlankOption' => true,
-                'chosen'             => true,
-                'tl_class'           => 'clr',
-            ],
-            'sql'              => "varchar(64) NOT NULL default ''",
-        ],
-        'crmInvoiceTpl'          => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'],
             'exclude'   => true,
             'inputType' => 'fileTree',
             'eval'      => [
@@ -346,7 +315,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => 'binary(16) NULL',
         ],
         'paid'                   => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['paid'],
             'inputType' => 'checkbox',
             'exclude'   => true,
             'filter'    => true,
@@ -357,7 +325,6 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'amountReceivedDate'     => [
-            'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['amountReceivedDate'],
             'exclude'   => true,
             'inputType' => 'text',
             'eval'      => [
@@ -430,6 +397,7 @@ class tl_crm_service extends Backend
     <div class="list-service-row-5">%s: %s %s (%s %s)</div>
     <div class="list-service-row-6">%s: %s %s</div>
 </div>';
+        $class = '';
 
         if ('invoiceDelivered' === $arrRow['invoiceType']) {
             $class = ' invoiceDelivered';
@@ -477,7 +445,7 @@ class tl_crm_service extends Backend
             $arrRow['invoiceNumber'],
             // Row 4
             $GLOBALS['TL_LANG']['MSC']['projectId'],
-            str_pad($arrRow['id'], 7, 0, STR_PAD_LEFT),
+            str_pad((string)$arrRow['id'], 7, '0', STR_PAD_LEFT),
             // Row 5
             $GLOBALS['TL_LANG']['MSC']['projectPrice'],
             $arrRow['price'],
