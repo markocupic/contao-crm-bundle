@@ -15,24 +15,14 @@ declare(strict_types=1);
 use Contao\Backend;
 use Contao\DataContainer;
 use Contao\Image;
-use Contao\Input;
-use Contao\StringUtil;
 use Contao\System;
-use Contao\Versions;
 
-/*
- * Table tl_crm_customer
- */
 $GLOBALS['TL_DCA']['tl_crm_customer'] = [
-    // Config
     'config'      => [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
-        'onsubmit_callback' => [
-            [
-                'tl_crm_customer',
-                'storeDateAdded',
-            ],
+        'onsubmit_callback' => [            [
+                'tl_crm_customer',                'storeDateAdded'            ],
         ],
         'sql'               => [
             'keys' => [
@@ -41,31 +31,19 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             ],
         ],
     ],
-
-    // List
     'list'        => [
         'sorting'           => [
-            'mode'        => 2,
-            'fields'      => ['dateAdded DESC'],
-            'flag'        => 1,
+            'mode'        => DataContainer::MODE_SORTABLE,
+            'fields'      => ['dateAdded'],
             'panelLayout' => 'filter;sort,search,limit',
         ],
         'label'             => [
-            'fields'         => [
-                'icon',
-                'firstname',
-                'lastname',
-                'dateAdded',
-            ],
+            'fields'         => ['icon', 'firstname', 'lastname', 'username', 'dateAdded'],
             'showColumns'    => true,
-            'label_callback' => [
-                'tl_crm_customer',
-                'addIcon',
-            ],
+            'label_callback' => ['tl_crm_customer', 'addIcon'],
         ],
         'global_operations' => [
             'all' => [
-                'label'      => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href'       => 'act=select',
                 'class'      => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"',
@@ -73,50 +51,36 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
         ],
         'operations'        => [
             'edit'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['edit'],
-                'href'  => 'act=edit',
-                'icon'  => 'edit.gif',
+                'href' => 'act=edit',
+                'icon' => 'edit.gif',
             ],
             'copy'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['copy'],
-                'href'  => 'act=copy',
-                'icon'  => 'copy.gif',
+                'href' => 'act=copy',
+                'icon' => 'copy.svg',
             ],
             'delete' => [
-                'label'      => &$GLOBALS['TL_LANG']['tl_crm_customer']['delete'],
                 'href'       => 'act=delete',
-                'icon'       => 'delete.gif',
+                'icon'       => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
             ],
             'toggle' => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_crm_customer']['toggle'],
-                'icon'            => 'visible.gif',
-                'attributes'      => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => [
-                    'tl_crm_customer',
-                    'toggleIcon',
-                ],
+                'href'    => 'act=toggle&amp;field=disable',
+                'icon'    => 'visible.svg',
+                'reverse' => true,
             ],
             'show'   => [
-                'label' => &$GLOBALS['TL_LANG']['tl_crm_customer']['show'],
-                'href'  => 'act=show',
-                'icon'  => 'show.gif',
+                'href' => 'act=show',
+                'icon' => 'show.svg',
             ],
         ],
     ],
-
-    // Palettes
     'palettes'    => [
         '__selector__' => ['assignDir'],
         'default'      => '{personal_legend},firstname,lastname,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{invoice_legend},ustId,invoiceAddress;{homedir_legend:hide},assignDir;{account_legend},disable',
     ],
-
-    // Subpalettes
     'subpalettes' => [
         'assignDir' => 'homeDir',
     ],
-
-    // Fields
     'fields'      => [
         'id'             => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -130,11 +94,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'lastname'       => [
@@ -143,25 +103,15 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory' => true,
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'gender'         => [
             'exclude'   => true,
             'inputType' => 'select',
-            'options'   => [
-                'male',
-                'female',
-            ],
+            'options'   => ['male', 'female', 'other'],
             'reference' => &$GLOBALS['TL_LANG']['MSC'],
-            'eval'      => [
-                'includeBlankOption' => true,
-                'tl_class'           => 'w50',
-            ],
+            'eval'      => ['includeBlankOption' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'company'        => [
@@ -170,30 +120,21 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sorting'   => true,
             'flag'      => 1,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'street'         => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'postal'         => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 32,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 32, 'tl_class' => 'w50'],
             'sql'       => "varchar(32) NOT NULL default ''",
         ],
         'city'           => [
@@ -202,114 +143,77 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'search'    => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'state'          => [
             'exclude'   => true,
             'sorting'   => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 64,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 64, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'country'        => [
-            'exclude'   => true,
-            'filter'    => true,
-            'sorting'   => true,
-            'inputType' => 'select',
-            'options'   => System::getCountries(),
-            'eval'      => [
-                'includeBlankOption' => true,
-                'chosen'             => true,
-                'tl_class'           => 'w50',
-            ],
-            'sql'       => "varchar(2) NOT NULL default ''",
+            'exclude'          => true,
+            'filter'           => true,
+            'sorting'          => true,
+            'inputType'        => 'select',
+            'eval'             => ['includeBlankOption' => true, 'chosen' => true, 'feEditable' => true, 'feViewable' => true, 'feGroup' => 'address', 'tl_class' => 'w50'],
+            'options_callback' => static function () {
+                $countries = System::getContainer()->get('contao.intl.countries')->getCountries();
+
+                // Convert to lower case for backwards compatibility, to be changed in Contao 5.0
+                return array_combine(array_map('strtolower', array_keys($countries)), $countries);
+            },
+            'sql'              => "varchar(2) NOT NULL default ''",
         ],
         'phone'          => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
-                'decodeEntities' => true,
-                'tl_class'       => 'w50',
-            ],
+            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'mobile'         => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
-                'decodeEntities' => true,
-                'tl_class'       => 'w50',
-            ],
+            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'fax'            => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength'      => 64,
-                'rgxp'           => 'phone',
-                'decodeEntities' => true,
-                'tl_class'       => 'w50',
-            ],
+            'eval'      => ['maxlength' => 64, 'rgxp' => 'phone', 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(64) NOT NULL default ''",
         ],
         'email'          => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'mandatory'      => true,
-                'maxlength'      => 255,
-                'rgxp'           => 'email',
-                'unique'         => true,
-                'decodeEntities' => true,
-                'tl_class'       => 'w50',
-            ],
+            'eval'      => ['mandatory' => true, 'maxlength' => 255, 'rgxp' => 'email', 'unique' => true, 'decodeEntities' => true, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'website'        => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'rgxp'      => 'url',
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['rgxp' => 'url', 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'ustId'          => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'text',
-            'eval'      => [
-                'maxlength' => 255,
-                'tl_class'  => 'w50',
-            ],
+            'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
         ],
         'invoiceAddress' => [
             'exclude'   => true,
             'search'    => true,
             'inputType' => 'textarea',
-            'eval'      => [
-                'decodeEntities' => false,
-                'tl_class'       => 'clr',
-            ],
+            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
             'sql'       => 'mediumtext NULL',
         ],
         'assignDir'      => [
@@ -320,8 +224,11 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
         ],
         'disable'        => [
             'exclude'   => true,
+            'toggle'    => true,
             'filter'    => true,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_DESC,
             'inputType' => 'checkbox',
+            'eval'      => ['doNotCopy' => true],
             'sql'       => "char(1) NOT NULL default ''",
         ],
         'dateAdded'      => [
@@ -329,11 +236,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'sorting'   => true,
             'flag'      => 6,
             'inputType' => 'text',
-            'eval'      => [
-                'rgxp'       => 'date',
-                'datepicker' => true,
-                'tl_class'   => 'clr wizard',
-            ],
+            'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
         ],
     ],
@@ -344,15 +247,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
  */
 class tl_crm_customer extends Backend
 {
-    /**
-     * tl_crm_customer constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->import('BackendUser', 'User');
-    }
-
     /**
      * Add an image to each record.
      *
@@ -365,12 +259,19 @@ class tl_crm_customer extends Backend
     public function addIcon($row, $label, DataContainer $dc, $args)
     {
         $image = 'member';
+        $disabled = false;
 
         if ($row['disable']) {
             $image .= '_';
+            $disabled = true;
         }
 
-        $args[0] = sprintf('<div class="list_icon_new" style="background-image:url(\'%ssystem/themes/%s/images/%s.gif\')" data-icon="%s.gif" data-icon-disabled="%s.gif">&nbsp;</div>', TL_ASSETS_URL, Backend::getTheme(), $image, $disabled ? $image : rtrim($image, '_'), rtrim($image, '_').'_');
+        $args[0] = sprintf(
+            '<div class="list_icon_new" style="background-image:url(\'%s\')" data-icon="%s" data-icon-disabled="%s">&nbsp;</div>',
+            Image::getPath($image),
+            Image::getPath($disabled ? $image : rtrim($image, '_')),
+            Image::getPath(rtrim($image, '_').'_')
+        );
 
         return $args;
     }
@@ -392,88 +293,10 @@ class tl_crm_customer extends Backend
             return;
         }
 
-        $this->Database->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
-            ->execute(time(), $dc->id);
+        $this->Database
+            ->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
+            ->execute(time(), $dc->id)
+        ;
     }
 
-    /**
-     * Return the "toggle visibility" button.
-     *
-     * @param array $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
-     */
-    public function toggleIcon($row, $href, $label, $title, $icon, $attributes)
-    {
-        if (strlen(Input::get('tid'))) {
-            $this->toggleVisibility(Input::get('tid'), 1 === Input::get('state'), (@func_get_arg(12) ?: null));
-            $this->redirect($this->getReferer());
-        }
-
-        // Check permissions AFTER checking the tid, so hacking attempts are logged
-        if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf')) {
-            return '';
-        }
-
-        $href .= '&amp;tid='.$row['id'].'&amp;state='.$row['disable'];
-
-        if ($row['disable']) {
-            $icon = 'invisible.gif';
-        }
-
-        return '<a href="'.$this->addToUrl($href).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label, 'data-state="'.($row['disable'] ? 0 : 1).'"').'</a> ';
-    }
-
-    /**
-     * Disable/enable a user group.
-     *
-     * @param int $intId
-     * @param bool $blnVisible
-     * @param DataContainer $dc
-     */
-    public function toggleVisibility($intId, $blnVisible, DataContainer $dc = null): void
-    {
-        // Set the ID and action
-        Input::setGet('id', $intId);
-        Input::setGet('act', 'toggle');
-
-        if ($dc) {
-            $dc->id = $intId; // see #8043
-        }
-
-        // Check the field access
-        if (!$this->User->hasAccess('tl_crm_customer::disable', 'alexf')) {
-            $this->log('Not enough permissions to activate/deactivate member ID "'.$intId.'"', __METHOD__, TL_ERROR);
-            $this->redirect('contao/main.php?act=error');
-        }
-
-        $objVersions = new Versions('tl_crm_customer', $intId);
-        $objVersions->initialize();
-
-        // Trigger the save_callback
-        if (is_array($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_crm_customer']['fields']['disable']['save_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $blnVisible = $this->{$callback[0]}->{$callback[1]}($blnVisible, ($dc ?: $this));
-                } elseif (is_callable($callback)) {
-                    $blnVisible = $callback($blnVisible, ($dc ?: $this));
-                }
-            }
-        }
-
-        $time = time();
-
-        // Update the database
-        $this->Database->prepare("UPDATE tl_crm_customer SET tstamp=$time, disable='".($blnVisible ? '' : 1)."' WHERE id=?")
-            ->execute($intId);
-
-        $objVersions->create();
-
-    }
 }

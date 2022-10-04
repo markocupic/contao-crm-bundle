@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
-$GLOBALS['TL_LANG']['tl_crm_service']['new'] = ['Neues Projekt anfangen', 'Legen Sie ein neues Proket an.'];
+$GLOBALS['TL_LANG']['tl_crm_service']['new'] = ['Neues Projekt anfangen', 'Legen Sie ein neues Projekt an.'];
 $GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'] = ['Rechnung/Kostenvoranschlag generieren (docx)', 'Rechnung/Kostenvoranschlag generieren (docx)'];
 $GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'] = ['Rechnung/Kostenvoranschlag generieren (pdf)', 'Rechnung/Kostenvoranschlag generieren (pdf)'];
 $GLOBALS['TL_LANG']['tl_crm_service']['edit'] = ['Das Projekt bearbeiten', 'Das Projekt bearbeiten'];
@@ -53,7 +53,7 @@ $GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'] = ['Rechnungsvorlage/docx
 $GLOBALS['TL_LANG']['tl_crm_service']['paid'] = ['Rechnung vom Kunden bezahlt/Projekt abgeschlossen', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['amountReceivedDate'] = ['Betrag erhalten am', ''];
 
-// Multicolumnwizard
+// Multi column wizard
 $GLOBALS['TL_LANG']['tl_crm_service']['position_item'] = ['Leistungsbeschrieb', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['position_quantity'] = ['Anzahl', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['position_price'] = ['Preis', ''];

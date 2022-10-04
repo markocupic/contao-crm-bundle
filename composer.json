@@ -21,8 +21,8 @@
     "source": "https://github.com/markocupic/contao-crm-bundle"
   },
   "require": {
-    "php": "^7.4|^8.0",
-    "contao/core-bundle": "^4.12",
+    "php": "^7.4 || ^8.0",
+    "contao/core-bundle": "^4.13",
     "markocupic/phpoffice-bundle": "^1.0",
     "markocupic/cloudconvert-bundle": "^2.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.5"
@@ -46,6 +46,6 @@
   },
   "extra": {
     "contao-manager-plugin": "Markocupic\\ContaoCrmBundle\\ContaoManager\\Plugin"
-  }
-
+  },
+  "version": "5"
 }
