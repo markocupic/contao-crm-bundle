@@ -21,8 +21,8 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
     'config'      => [
         'dataContainer'     => 'Table',
         'enableVersioning'  => true,
-        'onsubmit_callback' => [            [
-                'tl_crm_customer',                'storeDateAdded'            ],
+        'onsubmit_callback' => [
+            ['tl_crm_customer', 'storeDateAdded'],
         ],
         'sql'               => [
             'keys' => [
@@ -295,8 +295,7 @@ class tl_crm_customer extends Backend
 
         $this->Database
             ->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
-            ->execute(time(), $dc->id)
-        ;
+            ->execute(time(), $dc->id);
     }
 
 }
