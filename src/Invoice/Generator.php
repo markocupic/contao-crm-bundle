@@ -27,12 +27,10 @@ use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Safe\Exceptions\PcreException;
 use function Safe\preg_replace;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class Generator.
- */
 class Generator
 {
     protected ContaoFramework $framework;
@@ -64,6 +62,8 @@ class Generator
      *
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
+     * @throws PcreException
+     * @throws \Exception
      */
     public function generateInvoice(CrmServiceModel $objService, string $format = 'docx'): void
     {

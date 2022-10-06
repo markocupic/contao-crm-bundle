@@ -15,11 +15,6 @@ declare(strict_types=1);
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 
-if (TL_MODE === 'BE') {
-    $GLOBALS['TL_CSS'][] = 'bundles/markocupiccontaocrm/css/markocupic_crm_be.css';
-    $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaocrm/js/markocupic_crm_be.js';
-}
-
 /*
  * Backend modules
  */

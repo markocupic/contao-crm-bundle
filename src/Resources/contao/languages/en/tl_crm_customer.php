@@ -12,6 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+/*
+ * Global operations
+ */
 $GLOBALS['TL_LANG']['tl_crm_customer']['new'] = ['Neuen Kunden anlegen', 'Legen Sie einen neuen Kunden an.'];
 
 /*

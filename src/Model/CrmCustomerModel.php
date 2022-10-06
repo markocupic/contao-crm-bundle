@@ -16,9 +16,6 @@ namespace Markocupic\ContaoCrmBundle\Model;
 
 use Contao\Model;
 
-/**
- * Class CrmCustomerModel.
- */
 class CrmCustomerModel extends Model
 {
     protected static $strTable = 'tl_crm_customer';

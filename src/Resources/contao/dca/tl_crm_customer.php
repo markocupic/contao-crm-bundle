@@ -14,17 +14,13 @@ declare(strict_types=1);
 
 use Contao\Backend;
 use Contao\DataContainer;
-use Contao\Image;
 use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_crm_customer'] = [
     'config'      => [
-        'dataContainer'     => 'Table',
-        'enableVersioning'  => true,
-        'onsubmit_callback' => [
-            ['tl_crm_customer', 'storeDateAdded'],
-        ],
-        'sql'               => [
+        'dataContainer'    => 'Table',
+        'enableVersioning' => true,
+        'sql'              => [
             'keys' => [
                 'id'    => 'primary',
                 'email' => 'index',
@@ -38,9 +34,8 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'panelLayout' => 'filter;sort,search,limit',
         ],
         'label'             => [
-            'fields'         => ['icon', 'firstname', 'lastname', 'username', 'dateAdded'],
-            'showColumns'    => true,
-            'label_callback' => ['tl_crm_customer', 'addIcon'],
+            'fields'      => ['icon', 'firstname', 'lastname', 'username', 'dateAdded'],
+            'showColumns' => true,
         ],
         'global_operations' => [
             'all' => [
@@ -92,7 +87,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 1,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'inputType' => 'text',
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
@@ -101,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 1,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'inputType' => 'text',
             'eval'      => ['mandatory' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
@@ -118,7 +113,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
             'exclude'   => true,
             'search'    => true,
             'sorting'   => true,
-            'flag'      => 1,
+            'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
             'inputType' => 'text',
             'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
             'sql'       => "varchar(255) NOT NULL default ''",
@@ -234,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
         'dateAdded'      => [
             'default'   => time(),
             'sorting'   => true,
-            'flag'      => 6,
+            'flag'      => DataContainer::SORT_DAY_DESC,
             'inputType' => 'text',
             'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'],
             'sql'       => "int(10) unsigned NOT NULL default '0'",
@@ -247,54 +242,4 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
  */
 class tl_crm_customer extends Backend
 {
-    /**
-     * Add an image to each record.
-     *
-     * @param array $row
-     * @param string $label
-     * @param array $args
-     *
-     * @return array
-     */
-    public function addIcon($row, $label, DataContainer $dc, $args)
-    {
-        $image = 'member';
-        $disabled = false;
-
-        if ($row['disable']) {
-            $image .= '_';
-            $disabled = true;
-        }
-
-        $args[0] = sprintf(
-            '<div class="list_icon_new" style="background-image:url(\'%s\')" data-icon="%s" data-icon-disabled="%s">&nbsp;</div>',
-            Image::getPath($image),
-            Image::getPath($disabled ? $image : rtrim($image, '_')),
-            Image::getPath(rtrim($image, '_').'_')
-        );
-
-        return $args;
-    }
-
-    /**
-     * Store the date when the account has been added.
-     *
-     * @param DataContainer $dc
-     */
-    public function storeDateAdded($dc): void
-    {
-        // Front end call
-        if (!$dc instanceof DataContainer) {
-            return;
-        }
-
-        // Return if there is no active record (override all)
-        if (!$dc->activeRecord || $dc->activeRecord->dateAdded > 0) {
-            return;
-        }
-
-        $this->Database
-            ->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
-            ->execute(time(), $dc->id);
-    }
 }

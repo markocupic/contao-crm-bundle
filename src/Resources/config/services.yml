@@ -1,21 +1,14 @@
 services:
-
-  Markocupic\ContaoCrmBundle\Invoice\Generator:
-    arguments:
-      - '@contao.framework'
-      - '@contao.slug'
-      - '@Markocupic\ContaoCrmBundle\Invoice\Docx\Docx'
-      - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
-      - '@translator'
-      - '%kernel.project_dir%'
-      - '%markocupic_contao_crm.docx_invoice_template%'
-      - '%markocupic_contao_crm.temp_dir%'
+  _defaults:
+    autowire: true
+    autoconfigure: true
     public: true
+    bind:
+      $projectDir: '%kernel.project_dir%'
+      $docxInvoiceTemplate: '%markocupic_contao_crm.docx_invoice_template%'
+      $tempDir: '%markocupic_contao_crm.temp_dir%'
+      $cloudConvertApiKey: '%markocupic_cloudconvert.api_key%'
 
-  Markocupic\ContaoCrmBundle\Invoice\Docx\Docx:
-    arguments:
-      - '@contao.framework'
-      - '@translator'
-      - '%kernel.project_dir%'
-    public: true
-
+  Markocupic\ContaoCrmBundle\:
+    resource: ../../
+    exclude: ../../{DependencyInjection,Resources,Model}

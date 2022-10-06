@@ -5,9 +5,9 @@
 Dieses Contao Bundle bietet eine minimale CRM Funktionalität und wird für den privaten Gebrauch verwendet. 
 
 Es können Kunden erfasst werden und diesen Aufträge zugewiesen werden. 
-Nach Auftragsende kann eine Rechnung im docx- oder pdf-Format ([Cloudconvert](https://cloudconvert.com/api/v2#overview) API key nötig) gedruckt werden. 
+Nach Auftragsende kann eine Rechnung im docx- oder pdf-Format ([CloudConvert](https://cloudconvert.com/api/v2#overview) API key nötig) gedruckt werden. 
 
-Cloudconvert verlangt einen API Key, welcher in der Datei config/config.yml eingetragen werden sollte. Danach unbedingt den Cache neu aufbauen.
+CloudConvert verlangt einen API Key, welcher in der Datei config/config.yml eingetragen werden sollte.
  
 ```
 markocupic_cloudconvert:
@@ -21,5 +21,4 @@ mit einem Custom-Template updatesicher zu ersetzen, muss der Pfad zur docx-Datei
 ```
 markocupic_contao_crm:
   docx_invoice_template: 'files/crm/templates/docx/my_custom_invoice.docx'
-
 ```

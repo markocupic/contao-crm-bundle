@@ -26,34 +26,14 @@ use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class Docx.
- */
+
 class Docx
 {
-    /**
-     * @var ContaoFramework
-     */
-    protected $framework;
+    protected ContaoFramework $framework;
+    protected TranslatorInterface $translator;
+    protected string $projectDir;
+    protected array $tags = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var string
-     */
-    protected $projectDir;
-
-    /**
-     * @var array
-     */
-    protected $tags = [];
-
-    /**
-     * Generator constructor.
-     */
     public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $projectDir)
     {
         $this->framework = $framework;
@@ -70,8 +50,9 @@ class Docx
      *
      * @throws CopyFileException
      * @throws CreateTemporaryFileException
+     * @throws \Exception
      */
-    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templSrc, string $destinationSrc): File
+    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): File
     {
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
@@ -82,7 +63,7 @@ class Docx
         $this->setTags($objService, $objCustomer);
 
         // Instantiate the Template processor
-        $templateProcessor = new MsWordTemplateProcessor($templSrc, $destinationSrc);
+        $templateProcessor = new MsWordTemplateProcessor($templateSrc, $destinationSrc);
 
         // Replace tags
         if (isset($this->tags['tags']) && \is_array($this->tags['tags'])) {
@@ -165,6 +146,7 @@ class Docx
                 $objService->invoiceNumber
             );
         }
+        
         $this->tags['tags']['invoiceNumber'] = [$invoiceNumber, ['multiline' => false]];
 
         // Invoice type
@@ -212,6 +194,6 @@ class Docx
             return '';
         }
 
-        return htmlspecialchars(html_entity_decode((string) $string));
+        return htmlspecialchars(html_entity_decode($string));
     }
 }

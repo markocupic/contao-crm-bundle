@@ -1,14 +1,16 @@
+.tl_listing .list-service-row-1 {
+    font-weight: bold;
+}
 
-.tl_listing .list-service-row-1{
-  font-weight: bold;
+.tl_listing .invoice-paid .list-service-row-1 {
+    color: #00dd00;
 }
-.tl_listing .invoice-paid .list-service-row-1{
-  color: #00dd00;
+
+.tl_listing .invoice-delivered .list-service-row-1 {
+    color: #ff2117;
 }
-.tl_listing .invoice-delivered .list-service-row-1{
-  color: #ff2117;
-}
-.tl_listing .generateInvoiceDocx img, .tl_listing .generateInvoicePdf img{
-  width: 16px;
-  height: auto;
+
+.tl_listing .generateInvoiceDocx img, .tl_listing .generateInvoicePdf img {
+    width: 16px;
+    height: auto;
 }

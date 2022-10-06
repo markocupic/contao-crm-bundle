@@ -12,24 +12,12 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
-use Contao\Backend;
-use Contao\Date;
-use Contao\Image;
-use Contao\Input;
-use Contao\Message;
-use Contao\StringUtil;
-use Contao\System;
-use Markocupic\ContaoCrmBundle\Invoice\Generator;
-use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
-use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
+use Contao\DataContainer;
 
 $GLOBALS['TL_DCA']['tl_crm_service'] = [
     'config'      => [
         'dataContainer'    => 'Table',
         'enableVersioning' => true,
-        'onload_callback'  => [
-            ['tl_crm_service', 'checkCloudConvertApiKey'],
-        ],
         'sql'              => [
             'keys' => [
                 'id' => 'primary',
@@ -38,15 +26,14 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
     ],
     'list'        => [
         'sorting'           => [
-            'mode'               => 1,
+            'mode'               => DataContainer::MODE_SORTED,
             'fields'             => ['projectDateStart'],
-            'flag'               => 8,
+            'flag'               => DataContainer::SORT_MONTH_DESC,
             'panelLayout'        => 'filter;sort,search,limit',
             'child_record_class' => 'no_padding',
         ],
         'label'             => [
-            'fields'         => ['invoiceNumber', 'toCustomer', 'title'],
-            'label_callback' => ['tl_crm_service', 'listServices'],
+            'fields' => ['invoiceNumber', 'toCustomer', 'title'],
         ],
         'global_operations' => [
             'all' => [
@@ -75,16 +62,14 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                 'icon' => 'show.gif',
             ],
             'generateInvoiceDocx' => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
-                'href'            => 'action=generateInvoice&type=docx',
-                'button_callback' => ['tl_crm_service', 'generateInvoice'],
-                'icon'            => 'bundles/markocupiccontaocrm/images/docx.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'],
+                'href'  => 'action=generateInvoice&type=docx',
+                'icon'  => 'bundles/markocupiccontaocrm/images/docx.svg',
             ],
             'generateInvoicePdf'  => [
-                'label'           => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
-                'href'            => 'action=generateInvoice&type=pdf',
-                'button_callback' => ['tl_crm_service', 'generateInvoice'],
-                'icon'            => 'bundles/markocupiccontaocrm/images/pdf.svg',
+                'label' => &$GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'],
+                'href'  => 'action=generateInvoice&type=pdf',
+                'icon'  => 'bundles/markocupiccontaocrm/images/pdf.svg',
             ],
         ],
     ],
@@ -127,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
         'description'            => [
             'inputType' => 'textarea',
             'exclude'   => true,
-            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
+            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
             'sql'       => 'mediumtext NULL',
         ],
         'servicePositions'       => [
@@ -139,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_item'],
                         'exclude'   => true,
                         'inputType' => 'textarea',
-                        'eval'      => ['style' => 'width:95%;'],
+                        'eval'      => ['rte' => false, 'style' => 'width:95%;'],
                     ],
                     'quantity' => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_quantity'],
@@ -212,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
         'invoiceNumber'          => [
             'exclude'   => true,
             'inputType' => 'text',
-            'default'   => 'XXXX-'.Date::parse('m/Y'),
+            'default'   => 'XXXX-'.date('m/Y'),
             'eval'      => ['tl_class' => 'clr'],
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
@@ -220,13 +205,13 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'inputType' => 'textarea',
             'exclude'   => true,
             'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.'.chr(10).chr(10).'Mit besten Grüßen'.chr(10).chr(10).'Marko Cupic',
-            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
+            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
             'sql'       => 'mediumtext NULL',
         ],
         'alternativeInvoiceText' => [
             'inputType' => 'textarea',
             'exclude'   => true,
-            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
+            'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
             'sql'       => 'mediumtext NULL',
         ],
         'crmInvoiceTpl'          => [
@@ -250,122 +235,3 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
         ],
     ],
 ];
-
-class tl_crm_service extends Backend
-{
-    /**
-     * Return the print invoice button.
-     *
-     * @param array $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
-     */
-    public function generateInvoice($row, $href, $label, $title, $icon, $attributes)
-    {
-        if ('generateInvoice' === Input::get('action') && Input::get('id') && Input::get('type')) {
-            $type = Input::get('type');
-
-            if (null !== ($objInvoice = CrmServiceModel::findByPk(Input::get('id')))) {
-                $objInvoiceGenerator = System::getContainer()->get(Generator::class);
-                $objInvoiceGenerator->generateInvoice($objInvoice, $type);
-            }
-        }
-
-        return '<a href="'.$this->addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
-    }
-
-    /**
-     * Check Cloudconvert API key.
-     */
-    public function checkCloudConvertApiKey(): void
-    {
-        if (empty(System::getContainer()->getParameter('markocupic_contao_crm.cloudconvert_api_key'))) {
-            Message::addInfo('Please read the README.md in vendor/markocupic/contao-crm-bundle and add your Cloudconvert API key in config/config.yml for downloading pdf invoices.');
-        }
-    }
-
-    /**
-     * Add the type of input field.
-     *
-     * @param array $arrRow
-     *
-     * @return string
-     */
-    public function listServices($arrRow)
-    {
-        $strService = '
-<div class="tl_content_left %s" title="%s">
-    <div class="list-service-row-1">%s</div>
-    <div class="list-service-row-2">%s</div>
-    <div class="list-service-row-3">%s: %s</div>
-    <div class="list-service-row-4">%s: %s</div>
-    <div class="list-service-row-5">%s: %s %s (%s %s)</div>
-    <div class="list-service-row-6">%s: %s %s</div>
-</div>';
-        $class = '';
-
-        if ('invoiceDelivered' === $arrRow['invoiceType']) {
-            $class = ' invoiceDelivered';
-        }
-
-        if ($arrRow['paid']) {
-            $class = ' invoicePaid';
-        }
-
-        $key = $arrRow['invoiceType'];
-        $titleAttr = $arrRow['paid'] ? $GLOBALS['TL_LANG']['tl_crm_service']['paid'][0] : $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$key][0];
-
-        // Service positions
-        $servicePositions = StringUtil::deserialize($arrRow['servicePositions'], true);
-        $quantity = 0;
-        $unit = '';
-        $price = 0;
-
-        if (count($servicePositions)) {
-            foreach ($servicePositions as $service) {
-                if (isset($service['quantity']) && !empty($service['quantity'])) {
-                    $quantity += $service['quantity'];
-                }
-
-                if ('' === $unit && isset($service['unit']) && !empty($service['unit'])) {
-                    $unit = $service['unit'];
-                }
-
-                if (isset($service['price']) && !empty($service['price'])) {
-                    $price += (int)$service['price'];
-                }
-            }
-        }
-
-        return sprintf(
-            $strService,
-            $class,
-            $titleAttr,
-            // Row 1
-            CrmCustomerModel::findByPk($arrRow['toCustomer'])->company,
-            // Row 2
-            $arrRow['title'],
-            // Row 3
-            $GLOBALS['TL_LANG']['MSC']['invoiceNumber'],
-            $arrRow['invoiceNumber'],
-            // Row 4
-            $GLOBALS['TL_LANG']['MSC']['projectId'],
-            str_pad((string)$arrRow['id'], 7, '0', STR_PAD_LEFT),
-            // Row 5
-            $GLOBALS['TL_LANG']['MSC']['projectPrice'],
-            $arrRow['price'],
-            $arrRow['currency'],
-            $price,
-            $arrRow['currency'],
-            // Row 6
-            $GLOBALS['TL_LANG']['MSC']['expense'],
-            $quantity,
-            $unit,
-        );
-    }
-}

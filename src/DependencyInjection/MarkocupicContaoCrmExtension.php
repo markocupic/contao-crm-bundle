@@ -38,12 +38,9 @@ class MarkocupicContaoCrmExtension extends Extension
 
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader->load('parameters.yml');
         $loader->load('services.yml');
-        $loader->load('listener.yml');
 
         $container->setParameter('markocupic_contao_crm.temp_dir', $config['temp_dir']);
-        $container->setParameter('markocupic_contao_crm.cloudconvert_api_key', $config['cloudconvert_api_key']);
         $container->setParameter('markocupic_contao_crm.docx_invoice_template', $config['docx_invoice_template']);
     }
 }

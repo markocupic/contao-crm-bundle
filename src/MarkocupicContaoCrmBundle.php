@@ -16,9 +16,6 @@ namespace Markocupic\ContaoCrmBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MarkocupicContaoCrmBundle.
- */
 class MarkocupicContaoCrmBundle extends Bundle
 {
 }
