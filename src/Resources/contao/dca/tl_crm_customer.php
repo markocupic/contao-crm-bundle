@@ -297,5 +297,4 @@ class tl_crm_customer extends Backend
             ->prepare('UPDATE tl_crm_customer SET dateAdded = ? WHERE id = ?')
             ->execute(time(), $dc->id);
     }
-
 }
