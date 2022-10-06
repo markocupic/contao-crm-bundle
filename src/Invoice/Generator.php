@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\ContaoCrmBundle\Invoice;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Slug\Slug;
 use Contao\Date;
 use Contao\File;
 use Contao\FilesModel;
@@ -35,6 +36,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Generator
 {
     protected ContaoFramework $framework;
+    protected Slug $slug;
     protected Docx $docx;
     protected ConvertFile $convertFile;
     protected TranslatorInterface $translator;
@@ -45,9 +47,10 @@ class Generator
     /**
      * Generator constructor.
      */
-    public function __construct(ContaoFramework $framework, Docx $docx, ConvertFile $convertFile, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
+    public function __construct(ContaoFramework $framework, Slug $slug, Docx $docx, ConvertFile $convertFile, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
     {
         $this->framework = $framework;
+        $this->slug = $slug;
         $this->docx = $docx;
         $this->convertFile = $convertFile;
         $this->translator = $translator;
@@ -108,7 +111,14 @@ class Generator
             $objCustomer->company
         );
 
-        $filename = preg_replace('/[^a-zA-Z0-9_-]/', '_', $filename);
+        $options = [
+            'locale' => 'en',
+            'validChars' => 'a-zA-Z0-9_-',
+            'delimiter' => '_',
+        ];
+
+        $filename = $this->slug->generate($filename, $options);
+
         $filename = preg_replace('/[_]{2,}/', '_', $filename).'.docx';
 
         $destinationSrc = $this->tempDir.'/'.$filename;

@@ -3,6 +3,7 @@ services:
   Markocupic\ContaoCrmBundle\Invoice\Generator:
     arguments:
       - '@contao.framework'
+      - '@contao.slug'
       - '@Markocupic\ContaoCrmBundle\Invoice\Docx\Docx'
       - '@Markocupic\CloudconvertBundle\Conversion\ConvertFile'
       - '@translator'
