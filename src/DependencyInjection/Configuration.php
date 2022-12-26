@@ -33,7 +33,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('docx_invoice_template')
                     ->cannotBeEmpty()
                     ->info('Set the docx template path.')
-                    ->defaultValue('vendor/markocupic/contao-crm-bundle/src/Resources/contao/templates/crm_invoice_template_default.docx')
+                    ->defaultValue('vendor/markocupic/contao-crm-bundle/contao/templates/crm_invoice_template_default.docx')
                 ->end()
             ->end()
         ;
