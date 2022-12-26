@@ -13,10 +13,11 @@ declare(strict_types=1);
  */
 
 use Contao\DataContainer;
+use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_crm_service'] = [
     'config'      => [
-        'dataContainer'    => 'Table',
+        'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
         'sql'              => [
             'keys' => [
@@ -75,9 +76,15 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
     ],
     'palettes'    => [
         '__selector__' => ['paid'],
-        'default'      => '{service_legend},title,projectDateStart,toCustomer,description,servicePositions;{invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;{state_legend},paid',
+        'default'      => '
+        {service_legend},title,projectDateStart,toCustomer,description,servicePositions;
+        {invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;
+        {state_legend},paid
+        ',
     ],
-    'subpalettes' => ['paid' => 'amountReceivedDate'],
+    'subpalettes' => [
+        'paid' => 'amountReceivedDate',
+    ],
     'fields'      => [
         'id'                     => [
             'sql' => 'int(10) unsigned NOT NULL auto_increment',
@@ -131,33 +138,20 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
                         'exclude'   => true,
                         'inputType' => 'select',
                         'options'   => range(0.25, 50, 0.25),
-                        'eval'      => [
-                            'style'  => 'width:50px;',
-                            'chosen' => true,
-                        ],
+                        'eval'      => ['style' => 'width:100px;', 'chosen' => true],
                     ],
                     'unit'     => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_unit'],
                         'exclude'   => true,
                         'inputType' => 'select',
-                        'options'   => [
-                            'h',
-                            'Mt.',
-                            'Stk.',
-                        ],
-                        'eval'      => [
-                            'style'  => 'width:50px;',
-                            'chosen' => true,
-                        ],
+                        'options'   => ['h', 'Mt.', 'Stk.'],
+                        'eval'      => ['style' => 'width:100px', 'chosen' => true],
                     ],
                     'price'    => [
                         'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_price'],
                         'exclude'   => true,
                         'inputType' => 'text',
-                        'eval'      => [
-                            'rgxp'  => 'natural',
-                            'style' => 'width:50px;text-align:center;',
-                        ],
+                        'eval'      => ['rgxp' => 'natural', 'style' => 'width:50px;text-align:center;'],
                     ],
                 ],
             ],
@@ -198,7 +192,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
             'exclude'   => true,
             'inputType' => 'text',
             'default'   => 'XXXX-'.date('m/Y'),
-            'eval'      => ['tl_class' => 'clr'],
+            'eval'      => ['unique' => true, 'tl_class' => 'clr'],
             'sql'       => "varchar(128) NOT NULL default ''",
         ],
         'defaultInvoiceText'     => [

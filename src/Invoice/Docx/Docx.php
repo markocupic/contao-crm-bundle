@@ -26,7 +26,6 @@ use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-
 class Docx
 {
     protected ContaoFramework $framework;
@@ -146,7 +145,7 @@ class Docx
                 $objService->invoiceNumber
             );
         }
-        
+
         $this->tags['tags']['invoiceNumber'] = [$invoiceNumber, ['multiline' => false]];
 
         // Invoice type

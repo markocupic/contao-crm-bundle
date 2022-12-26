@@ -30,7 +30,7 @@ class CrmCustomer
     }
 
     #[AsCallback(table: 'tl_crm_customer', target: 'list.label.label', priority: 100)]
-    public function addIcon(array $row, string $label, DataContainer $dc, array $labels):array
+    public function addIcon(array $row, string $label, DataContainer $dc, array $labels): array
     {
         $image = 'member';
         $disabled = false;

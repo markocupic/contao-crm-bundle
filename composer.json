@@ -1,41 +1,41 @@
 {
-  "name": "markocupic/contao-crm-bundle",
-  "description": "Mini CRM for private usage",
-  "keywords": [
-    "contao",
-    "bundle",
-    "CRM"
-  ],
-  "type": "contao-bundle",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Marko Cupic",
-      "email": "m.cupic@gmx.ch",
-      "homepage": "https://github.com/markocupic/contao-crm-bundle",
-      "role": "Developer"
+    "name": "markocupic/contao-crm-bundle",
+    "description": "Mini CRM for private usage",
+    "keywords": [
+        "contao",
+        "bundle",
+        "CRM"
+    ],
+    "type": "contao-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marko Cupic",
+            "email": "m.cupic@gmx.ch",
+            "homepage": "https://github.com/markocupic/contao-crm-bundle",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/markocupic/contao-crm-bundle/issues",
+        "source": "https://github.com/markocupic/contao-crm-bundle"
+    },
+    "require": {
+        "php": "^8.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "markocupic/phpoffice-bundle": "^1.0",
+        "markocupic/cloudconvert-bundle": "^2.0",
+        "menatwork/contao-multicolumnwizard-bundle": "^3.5"
+    },
+    "require-dev": {
+        "contao/easy-coding-standard": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Markocupic\\ContaoCrmBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "Markocupic\\ContaoCrmBundle\\ContaoManager\\Plugin"
     }
-  ],
-  "support": {
-    "issues": "https://github.com/markocupic/contao-crm-bundle/issues",
-    "source": "https://github.com/markocupic/contao-crm-bundle"
-  },
-  "require": {
-    "php": "^8.0",
-    "contao/core-bundle": "^4.13 || ^5.0",
-    "markocupic/phpoffice-bundle": "^1.0",
-    "markocupic/cloudconvert-bundle": "^2.0",
-    "menatwork/contao-multicolumnwizard-bundle": "^3.5"
-  },
-  "require-dev": {
-    "contao/easy-coding-standard": "^5.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Markocupic\\ContaoCrmBundle\\": "src/"
-    }
-  },
-  "extra": {
-    "contao-manager-plugin": "Markocupic\\ContaoCrmBundle\\ContaoManager\\Plugin"
-  }
 }

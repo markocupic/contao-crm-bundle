@@ -1,10 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of Contao CRM Bundle.
+ *
+ * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * @license GPL-3.0-or-later
+ * For the full copyright and license information,
+ * please view the LICENSE file that was distributed with this source code.
+ * @link https://github.com/markocupic/contao-crm-bundle
+ */
 
 namespace Markocupic\ContaoCrmBundle\DataContainer;
 
-use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\Image;
 use Contao\Input;
 use Contao\Message;
@@ -12,6 +23,8 @@ use Contao\StringUtil;
 use Markocupic\ContaoCrmBundle\Invoice\Generator;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
+use PhpOffice\PhpWord\Exception\CopyFileException;
+use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 
 class CrmService
 {
@@ -25,8 +38,8 @@ class CrmService
     }
 
     /**
-     * @throws \PhpOffice\PhpWord\Exception\CopyFileException
-     * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
+     * @throws CopyFileException
+     * @throws CreateTemporaryFileException
      */
     #[AsCallback(table: 'tl_crm_service', target: 'list.operations.generateInvoiceDocx.button', priority: 100)]
     #[AsCallback(table: 'tl_crm_service', target: 'list.operations.generateInvoicePdf.button', priority: 100)]
@@ -56,7 +69,7 @@ class CrmService
     {
         $strService = '
 <div class="tl_content_left %s" title="%s">
-    <div class="list-service-row-1">%s</div>
+    <div class="list-service-row-1">%s/Kd-Nr: %s</div>
     <div class="list-service-row-2">%s</div>
     <div class="list-service-row-3">%s: %s</div>
     <div class="list-service-row-4">%s: %s</div>
@@ -82,7 +95,7 @@ class CrmService
         $unit = '';
         $price = 0;
 
-        if (count($servicePositions)) {
+        if (\count($servicePositions)) {
             foreach ($servicePositions as $service) {
                 if (isset($service['quantity']) && !empty($service['quantity'])) {
                     $quantity += $service['quantity'];
@@ -93,7 +106,7 @@ class CrmService
                 }
 
                 if (isset($service['price']) && !empty($service['price'])) {
-                    $price += (int)$service['price'];
+                    $price += (int) $service['price'];
                 }
             }
         }
@@ -104,6 +117,7 @@ class CrmService
             $titleAttr,
             // Row 1
             CrmCustomerModel::findByPk($arrRow['toCustomer'])->company,
+            CrmCustomerModel::findByPk($arrRow['toCustomer'])->id,
             // Row 2
             $arrRow['title'],
             // Row 3
@@ -111,7 +125,7 @@ class CrmService
             $arrRow['invoiceNumber'],
             // Row 4
             $GLOBALS['TL_LANG']['MSC']['projectId'],
-            str_pad((string)$arrRow['id'], 7, '0', STR_PAD_LEFT),
+            str_pad((string) $arrRow['id'], 7, '0', STR_PAD_LEFT),
             // Row 5
             $GLOBALS['TL_LANG']['MSC']['projectPrice'],
             $arrRow['price'],

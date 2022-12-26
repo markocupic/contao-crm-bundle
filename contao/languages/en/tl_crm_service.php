@@ -12,20 +12,20 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+/**
+ * Global operations
+ */
 $GLOBALS['TL_LANG']['tl_crm_service']['new'] = ['Neues Projekt anfangen', 'Legen Sie ein neues Projekt an.'];
+
+/**
+ * Operations
+ */
 $GLOBALS['TL_LANG']['tl_crm_service']['generateInvoiceDocx'] = ['Rechnung/Kostenvoranschlag generieren (docx)', 'Rechnung/Kostenvoranschlag generieren (docx)'];
 $GLOBALS['TL_LANG']['tl_crm_service']['generateInvoicePdf'] = ['Rechnung/Kostenvoranschlag generieren (pdf)', 'Rechnung/Kostenvoranschlag generieren (pdf)'];
 $GLOBALS['TL_LANG']['tl_crm_service']['edit'] = ['Das Projekt bearbeiten', 'Das Projekt bearbeiten'];
 $GLOBALS['TL_LANG']['tl_crm_service']['copy'] = ['Das Projekt duplizieren', 'Das Projekt duplizieren'];
 $GLOBALS['TL_LANG']['tl_crm_service']['delete'] = ['Das Projekt löschen', 'Das Projekt löschen'];
 $GLOBALS['TL_LANG']['tl_crm_service']['show'] = ['Das Projekt ansehen', 'Das Projekt ansehen'];
-
-/*
- * Reference
- */
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['calculation'] = ['Status: Kostenvoranschlag dem Kunden zugestellt.', 'Kostenvoranschlag'];
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceDelivered'] = ['Status: Rechnung dem Kunden zugestellt, Betrag aber noch nicht erhalten.', 'Rechnung'];
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceNotDelivered'] = ['Status: Rechnung dem Kunden noch nicht zugestellt.', 'Rechnung noch nicht zugestellt'];
 
 /*
  * Legends
@@ -52,9 +52,15 @@ $GLOBALS['TL_LANG']['tl_crm_service']['alternativeInvoiceText'] = ['Alternativer
 $GLOBALS['TL_LANG']['tl_crm_service']['crmInvoiceTpl'] = ['Rechnungsvorlage/docx-Template', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['paid'] = ['Rechnung vom Kunden bezahlt/Projekt abgeschlossen', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['amountReceivedDate'] = ['Betrag erhalten am', ''];
-
 // Multi column wizard
 $GLOBALS['TL_LANG']['tl_crm_service']['position_item'] = ['Leistungsbeschrieb', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['position_quantity'] = ['Anzahl', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['position_price'] = ['Preis', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['position_unit'] = ['Einheit', ''];
+
+/*
+ * References
+ */
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['calculation'] = ['Status: Kostenvoranschlag dem Kunden zugestellt.', 'Kostenvoranschlag'];
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceDelivered'] = ['Status: Rechnung dem Kunden zugestellt, Betrag aber noch nicht erhalten.', 'Rechnung'];
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceNotDelivered'] = ['Status: Rechnung dem Kunden noch nicht zugestellt.', 'Rechnung noch nicht zugestellt'];

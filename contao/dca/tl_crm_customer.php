@@ -12,13 +12,13 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
-use Contao\Backend;
 use Contao\DataContainer;
+use Contao\DC_Table;
 use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_crm_customer'] = [
     'config'      => [
-        'dataContainer'    => 'Table',
+        'dataContainer'    => DC_Table::class,
         'enableVersioning' => true,
         'sql'              => [
             'keys' => [
@@ -71,7 +71,14 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
     ],
     'palettes'    => [
         '__selector__' => ['assignDir'],
-        'default'      => '{personal_legend},firstname,lastname,gender;{address_legend:hide},company,street,postal,city,state,country;{contact_legend},phone,mobile,fax,email,website;{invoice_legend},ustId,invoiceAddress;{homedir_legend:hide},assignDir;{account_legend},disable',
+        'default'      => '
+        {personal_legend},firstname,lastname,gender;
+        {address_legend:hide},company,street,postal,city,state,country;
+        {contact_legend},phone,mobile,fax,email,website;
+        {invoice_legend},ustId,invoiceAddress;
+        {homedir_legend:hide},assignDir;
+        {account_legend},disable
+        ',
     ],
     'subpalettes' => [
         'assignDir' => 'homeDir',
@@ -236,10 +243,3 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
         ],
     ],
 ];
-
-/**
- * Class tl_crm_customer.
- */
-class tl_crm_customer extends Backend
-{
-}

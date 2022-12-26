@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-/**
- * Class MarkocupicContaoCrmExtension.
- */
 class MarkocupicContaoCrmExtension extends Extension
 {
     /**
@@ -33,7 +30,7 @@ class MarkocupicContaoCrmExtension extends Extension
 
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__.'/../Resources/config')
+            new FileLocator(__DIR__.'/../../config')
         );
 
         $config = $this->processConfiguration($configuration, $configs);

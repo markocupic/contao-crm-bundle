@@ -12,6 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+/**
+ * Backend modules
+ */
 $GLOBALS['TL_LANG']['MOD']['crm'] = 'CRM';
 $GLOBALS['TL_LANG']['MOD']['customer'][0] = 'Kunden';
 $GLOBALS['TL_LANG']['MOD']['service'][0] = 'Leistungen';

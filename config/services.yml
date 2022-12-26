@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+        bind:
+            $projectDir: '%kernel.project_dir%'
+            $docxInvoiceTemplate: '%markocupic_contao_crm.docx_invoice_template%'
+            $tempDir: '%markocupic_contao_crm.temp_dir%'
+            $cloudConvertApiKey: '%markocupic_cloudconvert.api_key%'
+
+    Markocupic\ContaoCrmBundle\:
+        resource: ../src/
+        exclude: ../src/{DependencyInjection,Resources,Model}

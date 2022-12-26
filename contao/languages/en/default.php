@@ -12,6 +12,9 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+/**
+ * Miscellaneous
+ */
 $GLOBALS['TL_LANG']['MSC']['expense'] = 'Aufwand';
 $GLOBALS['TL_LANG']['MSC']['projectPrice'] = 'Preis';
 $GLOBALS['TL_LANG']['MSC']['invoiceNumber'] = 'Rechnungsnummer';
