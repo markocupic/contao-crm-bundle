@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -28,24 +28,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Docx
 {
-    protected ContaoFramework $framework;
-    protected TranslatorInterface $translator;
-    protected string $projectDir;
     protected array $tags = [];
 
-    public function __construct(ContaoFramework $framework, TranslatorInterface $translator, string $projectDir)
-    {
-        $this->framework = $framework;
-        $this->translator = $translator;
-        $this->projectDir = $projectDir;
-
+    public function __construct(
+        protected readonly ContaoFramework $framework,
+        protected readonly TranslatorInterface $translator,
+        protected readonly string $projectDir,
+    ) {
         // Prepare the tags array
         $this->tags['clones'] = [];
         $this->tags['tags'] = [];
     }
 
     /**
-     * Generate Invoice.
+     * Generate the invoice.
      *
      * @throws CopyFileException
      * @throws CreateTemporaryFileException

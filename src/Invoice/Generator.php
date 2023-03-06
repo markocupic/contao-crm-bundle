@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2022 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -28,33 +28,21 @@ use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Safe\Exceptions\PcreException;
-use function Safe\preg_replace;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use function Safe\preg_replace;
 
 class Generator
 {
-    protected ContaoFramework $framework;
-    protected Slug $slug;
-    protected Docx $docx;
-    protected ConvertFile $convertFile;
-    protected TranslatorInterface $translator;
-    protected string $projectDir;
-    protected string $docxInvoiceTemplate;
-    protected string $tempDir;
-
-    /**
-     * Generator constructor.
-     */
-    public function __construct(ContaoFramework $framework, Slug $slug, Docx $docx, ConvertFile $convertFile, TranslatorInterface $translator, string $projectDir, string $docxInvoiceTemplate, string $tempDir)
-    {
-        $this->framework = $framework;
-        $this->slug = $slug;
-        $this->docx = $docx;
-        $this->convertFile = $convertFile;
-        $this->translator = $translator;
-        $this->projectDir = $projectDir;
-        $this->docxInvoiceTemplate = $docxInvoiceTemplate;
-        $this->tempDir = $tempDir;
+    public function __construct(
+        protected readonly ContaoFramework $framework,
+        protected readonly Slug $slug,
+        protected readonly Docx $docx,
+        protected readonly ConvertFile $convertFile,
+        protected readonly TranslatorInterface $translator,
+        protected readonly string $projectDir,
+        protected string $docxInvoiceTemplate,
+        protected readonly string $tempDir,
+    ) {
     }
 
     /**
