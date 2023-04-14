@@ -25,7 +25,7 @@
         "contao/core-bundle": "^5.1",
         "markocupic/phpoffice-bundle": "^1.0",
         "markocupic/cloudconvert-bundle": "^2.0",
-        "menatwork/contao-multicolumnwizard-bundle": "dev-feature/contao-5-support"
+        "menatwork/contao-multicolumnwizard-bundle": "^3.6"
     },
     "require-dev": {
         "contao/easy-coding-standard": "^5.0"
