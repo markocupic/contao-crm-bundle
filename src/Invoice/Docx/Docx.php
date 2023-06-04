@@ -19,6 +19,7 @@ use Contao\Date;
 use Contao\File;
 use Contao\StringUtil;
 use Contao\System;
+use Markocupic\ContaoCrmBundle\Config\InvoiceType;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
@@ -134,7 +135,11 @@ class Docx
         // Invoice Number
         $invoiceNumber = '';
 
-        if ('invoiceDelivered' === $objService->invoiceType) {
+        if (InvoiceType::CALCULATION === $objService->invoiceType) {
+            $invoiceNumber = '---';
+        }
+
+        if (InvoiceType::INVOICE_DELIVERED === $objService->invoiceType) {
             $invoiceNumber = sprintf(
                 '%s: %s',
                 $this->translator->trans('MSC.invoiceNumber', [], 'contao_default'),

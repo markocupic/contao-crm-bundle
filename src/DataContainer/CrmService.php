@@ -20,6 +20,7 @@ use Contao\Image;
 use Contao\Input;
 use Contao\Message;
 use Contao\StringUtil;
+use Markocupic\ContaoCrmBundle\Config\InvoiceType;
 use Markocupic\ContaoCrmBundle\Invoice\Generator;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
@@ -78,7 +79,7 @@ class CrmService
 </div>';
         $class = '';
 
-        if ('invoiceDelivered' === $arrRow['invoiceType']) {
+        if (InvoiceType::INVOICE_DELIVERED === $arrRow['invoiceType']) {
             $class = ' invoiceDelivered';
         }
 

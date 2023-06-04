@@ -12,6 +12,8 @@ declare(strict_types=1);
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+use Markocupic\ContaoCrmBundle\Config\InvoiceType;
+
 /*
  * Global operations
  */
@@ -61,6 +63,6 @@ $GLOBALS['TL_LANG']['tl_crm_service']['position_unit'] = ['Einheit', ''];
 /*
  * References
  */
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['calculation'] = ['Status: Kostenvoranschlag dem Kunden zugestellt.', 'Kostenvoranschlag'];
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceDelivered'] = ['Status: Rechnung dem Kunden zugestellt, Betrag aber noch nicht erhalten.', 'Rechnung'];
-$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference']['invoiceNotDelivered'] = ['Status: Rechnung dem Kunden noch nicht zugestellt.', 'Rechnung noch nicht zugestellt'];
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][InvoiceType::CALCULATION] = ['Status: Kostenvoranschlag dem Kunden zugestellt.', 'Kostenvoranschlag'];
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][InvoiceType::INVOICE_DELIVERED] = ['Status: Rechnung dem Kunden zugestellt, Betrag aber noch nicht erhalten.', 'Rechnung'];
+$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][InvoiceType::INVOICE_NOT_DELIVERED] = ['Status: Rechnung dem Kunden noch nicht zugestellt.', 'Rechnung noch nicht zugestellt'];

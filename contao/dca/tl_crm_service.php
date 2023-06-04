@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Contao\DataContainer;
 use Contao\DC_Table;
+use Markocupic\ContaoCrmBundle\Config\InvoiceType;
 
 $GLOBALS['TL_DCA']['tl_crm_service'] = [
 	'config'      => [
@@ -176,7 +177,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'search'    => true,
 			'exclude'   => true,
 			'reference' => &$GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'],
-			'options'   => ['calculation', 'invoiceNotDelivered', 'invoiceDelivered'],
+			'options'   => InvoiceType::ALL,
 			'inputType' => 'select',
 			'eval'      => ['tl_class' => 'w50 wizard'],
 			'sql'       => "varchar(128) NOT NULL default ''",
