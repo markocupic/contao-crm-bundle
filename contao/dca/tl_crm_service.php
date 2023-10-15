@@ -96,6 +96,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 		'title'                  => [
 			'inputType' => 'text',
 			'exclude'   => true,
+			'search'    => true,
 			'eval'      => ['mandatory' => true, 'maxlength' => 250, 'tl_class' => 'clr'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
@@ -120,6 +121,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 		'description'            => [
 			'inputType' => 'textarea',
 			'exclude'   => true,
+			'search'    => true,
 			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
 			'sql'       => 'mediumtext NULL',
 		],
@@ -191,6 +193,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 		],
 		'invoiceNumber'          => [
 			'exclude'   => true,
+			'search'    => true,
 			'inputType' => 'text',
 			'default'   => 'XXXX-'.date('m/Y'),
 			'eval'      => ['unique' => true, 'tl_class' => 'clr'],
@@ -206,6 +209,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 		'alternativeInvoiceText' => [
 			'inputType' => 'textarea',
 			'exclude'   => true,
+			'search'    => true,
 			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
 			'sql'       => 'mediumtext NULL',
 		],
