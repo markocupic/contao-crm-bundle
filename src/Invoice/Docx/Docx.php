@@ -25,6 +25,7 @@ use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Docx
@@ -44,22 +45,28 @@ class Docx
     /**
      * Generate the invoice.
      *
-     * @throws CopyFileException
-     * @throws CreateTemporaryFileException
+     * @param CrmServiceModel $objService
+     * @param CrmCustomerModel $objCustomer
+     * @param string $templateSrc
+     * @param string $destinationSrc
+     * @return \SplFileObject
      * @throws \Exception
      */
-    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): File
+    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): \SplFileObject
     {
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
+
+        $docxTemplateSrc = Path::makeAbsolute($templateSrc, $this->projectDir);
+        $destinationSrc = Path::makeAbsolute($destinationSrc, $this->projectDir);
 
         // Load language
         $systemAdapter->loadLanguageFile('tl_crm_service');
 
         $this->setTags($objService, $objCustomer);
 
-        // Instantiate the Template processor
-        $templateProcessor = new MsWordTemplateProcessor($templateSrc, $destinationSrc);
+        // Instantiate the template processor
+        $templateProcessor = new MsWordTemplateProcessor($docxTemplateSrc, $destinationSrc);
 
         // Replace tags
         if (isset($this->tags['tags']) && \is_array($this->tags['tags'])) {
@@ -86,18 +93,15 @@ class Docx
         }
 
         // Remove old file
-        if (file_exists($this->projectDir.'/'.$destinationSrc)) {
-            unlink($this->projectDir.'/'.$destinationSrc);
+        if (file_exists($destinationSrc)) {
+            unlink($destinationSrc);
         }
 
         // Save file to system/tmp
-        $templateProcessor->generateUncached(true)
-            ->sendToBrowser(false)
-            ->generate()
-        ;
+        $objSplFile = $templateProcessor->generate();
 
-        if (file_exists($this->projectDir.'/'.$destinationSrc)) {
-            return new File($destinationSrc);
+        if (file_exists($objSplFile->getRealPath())) {
+            return $objSplFile;
         }
 
         throw new \Exception('Failed generating Invoice from docx template.');

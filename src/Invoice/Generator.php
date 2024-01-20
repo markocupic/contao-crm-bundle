@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace Markocupic\ContaoCrmBundle\Invoice;
 
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Date;
-use Contao\File;
 use Contao\FilesModel;
 use Contao\System;
 use Contao\Validator;
@@ -25,11 +25,9 @@ use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\ContaoCrmBundle\Invoice\Docx\Docx;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
-use Safe\Exceptions\PcreException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use function Safe\preg_replace;
 
 class Generator
 {
@@ -39,7 +37,6 @@ class Generator
         protected readonly Docx $docx,
         protected readonly ConvertFile $convertFile,
         protected readonly TranslatorInterface $translator,
-        protected readonly string $projectDir,
         protected string $docxInvoiceTemplate,
         protected readonly string $tempDir,
     ) {
@@ -48,9 +45,9 @@ class Generator
     /**
      * Generate the invoice from a docx template.
      *
-     * @throws CopyFileException
-     * @throws CreateTemporaryFileException
-     * @throws PcreException
+     * @param CrmServiceModel $objService
+     * @param string $format
+     * @return void
      * @throws \Exception
      */
     public function generateInvoice(CrmServiceModel $objService, string $format = 'docx'): void
@@ -111,28 +108,21 @@ class Generator
 
         $destinationSrc = $this->tempDir.'/'.$filename;
 
-        $objFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
+        $objSplFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
 
         if ('pdf' === $format) {
-            $this->sendPdfToBrowser($objFile);
-        } else {
-            $objFile->sendToBrowser();
+            $objSplFile = $this->convertFile
+                ->file($objSplFile->getRealPath())
+                ->convertTo('pdf')
+            ;
         }
+
+        throw new ResponseException($this->sendToBrowser($objSplFile));
+
+
     }
 
-    /**
-     * Convert docx to pdf.
-     *
-     * @throws \Exception
-     */
-    protected function sendPdfToBrowser(File $objFile): void
-    {
-        $this->convertFile
-            ->file($this->projectDir.'/'.$objFile->path)
-            ->sendToBrowser(true, true)
-            ->convertTo('pdf')
-        ;
-    }
+
 
     protected function prepareString(string $string = ''): string
     {
@@ -141,5 +131,13 @@ class Generator
         }
 
         return htmlspecialchars(html_entity_decode($string));
+    }
+
+    protected function sendToBrowser(\SplFileInfo|string $file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
+    {
+        $response = new BinaryFileResponse($file);
+        $response->setContentDisposition($disposition, $fileName ?? $response->getFile()->getFilename());
+
+        return $response;
     }
 }
