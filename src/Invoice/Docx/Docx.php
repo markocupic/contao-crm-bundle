@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2023 <m.cupic@gmx.ch>
+ * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -16,15 +16,12 @@ namespace Markocupic\ContaoCrmBundle\Invoice\Docx;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Date;
-use Contao\File;
 use Contao\StringUtil;
 use Contao\System;
 use Markocupic\ContaoCrmBundle\Config\InvoiceType;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use Markocupic\PhpOffice\PhpWord\MsWordTemplateProcessor;
-use PhpOffice\PhpWord\Exception\CopyFileException;
-use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -45,11 +42,6 @@ class Docx
     /**
      * Generate the invoice.
      *
-     * @param CrmServiceModel $objService
-     * @param CrmCustomerModel $objCustomer
-     * @param string $templateSrc
-     * @param string $destinationSrc
-     * @return \SplFileObject
      * @throws \Exception
      */
     public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): \SplFileObject
