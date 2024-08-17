@@ -182,7 +182,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'options'   => InvoiceType::ALL,
 			'inputType' => 'select',
 			'eval'      => ['tl_class' => 'w50 wizard'],
-			'sql'       => "varchar(128) NOT NULL default ''",
+			'sql'       => "varchar(128) NOT NULL default '".InvoiceType::CALCULATION."'",
 		],
 		'invoiceDate'            => [
 			'default'   => time(),

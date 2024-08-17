@@ -87,7 +87,8 @@ class CrmService
             $class = ' invoicePaid';
         }
 
-        $key = $arrRow['invoiceType'];
+        $key = empty($arrRow['invoiceType']) ? InvoiceType::CALCULATION : $arrRow['invoiceType'];
+
         $titleAttr = $arrRow['paid'] ? $GLOBALS['TL_LANG']['tl_crm_service']['paid'][0] : $GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$key][0];
 
         // Service positions
@@ -117,8 +118,8 @@ class CrmService
             $class,
             $titleAttr,
             // Row 1
-            CrmCustomerModel::findByPk($arrRow['toCustomer'])->company,
-            CrmCustomerModel::findByPk($arrRow['toCustomer'])->id,
+            $arrRow['toCustomer'] ? CrmCustomerModel::findByPk($arrRow['toCustomer'])->company : '---',
+            $arrRow['toCustomer'] ? CrmCustomerModel::findByPk($arrRow['toCustomer'])->id : '---',
             // Row 2
             $arrRow['title'],
             // Row 3
