@@ -121,11 +121,7 @@ class Docx
 
         $this->tags['tags']['invoiceDate'] = [$dateAdapter->parse('d.m.Y', $objService->invoiceDate), ['multiline' => false]];
 
-        $projectId = sprintf(
-            '%s: %s',
-            $this->translator->trans('MSC.projectId', [], 'contao_default'),
-            str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT)
-        );
+        $projectId = str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT);
         $this->tags['tags']['projectId'] = [$projectId, ['multiline' => false]];
 
         // Invoice Number
@@ -136,11 +132,7 @@ class Docx
         }
 
         if (InvoiceType::INVOICE_DELIVERED === $objService->invoiceType) {
-            $invoiceNumber = sprintf(
-                '%s: %s',
-                $this->translator->trans('MSC.invoiceNumber', [], 'contao_default'),
-                $objService->invoiceNumber
-            );
+            $invoiceNumber = $objService->invoiceNumber;
         }
 
         $this->tags['tags']['invoiceNumber'] = [$invoiceNumber, ['multiline' => false]];
@@ -149,11 +141,7 @@ class Docx
         $this->tags['tags']['invoiceType'] = [strtoupper($GLOBALS['TL_LANG']['tl_crm_service']['invoiceTypeReference'][$objService->invoiceType][1]), ['multiline' => false]];
 
         // Customer ID
-        $customerId = sprintf(
-            '%s: %s',
-            $this->translator->trans('MSC.customerId', [], 'contao_default'),
-            str_pad((string) $objCustomer->id, 7, '0', STR_PAD_LEFT)
-        );
+        $customerId = str_pad((string) $objCustomer->id, 7, '0', STR_PAD_LEFT);
         $this->tags['tags']['customerId'] = [$customerId, ['multiline' => false]];
 
         // Invoice table
