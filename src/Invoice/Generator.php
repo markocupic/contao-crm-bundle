@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -19,12 +19,20 @@ use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\CoreBundle\Slug\Slug;
 use Contao\Date;
 use Contao\FilesModel;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
 use Markocupic\ContaoCrmBundle\Invoice\Docx\Docx;
+use Markocupic\ContaoCrmBundle\Model\CrmCompanyModel;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
+use Markocupic\ContaoCrmBundle\QrCodeBill\Creditor;
+use Markocupic\ContaoCrmBundle\QrCodeBill\Deptor;
+use Markocupic\ContaoCrmBundle\QrCodeBill\PdfMerger;
+use Markocupic\ContaoCrmBundle\QrCodeBill\QrInvoiceGenerator;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,11 +41,14 @@ class Generator
 {
     public function __construct(
         protected readonly ContaoFramework $framework,
-        protected readonly Slug $slug,
-        protected readonly Docx $docx,
         protected readonly ConvertFile $convertFile,
+        protected readonly Docx $docx,
+        protected readonly PdfMerger $pdfMerger,
+        protected readonly QrInvoiceGenerator $qrInvoiceGenerator,
+        protected readonly Slug $slug,
         protected readonly TranslatorInterface $translator,
         protected string $docxInvoiceTemplate,
+        protected readonly string $projectDir,
         protected readonly string $tempDir,
     ) {
     }
@@ -68,10 +79,10 @@ class Generator
         $systemAdapter->loadLanguageFile('tl_crm_service');
 
         // Get customer object
-        $objCustomer = $crmCustomerModelAdapter->findByPk($objService->toCustomer);
+        $objCustomer = $crmCustomerModelAdapter->findById($objService->toCustomer);
 
         if (null === $objCustomer) {
-            throw new \Exception(sprintf('Data record tl_crm_customer with ID %s is null.', $objService->toCustomer));
+            throw new \Exception(\sprintf('Data record tl_crm_customer with ID %s is null.', $objService->toCustomer));
         }
 
         // Get the template path
@@ -85,12 +96,12 @@ class Generator
 
         // Generate filename
         $type = $this->translator->trans('tl_crm_service.invoiceTypeReference.'.$objService->invoiceType.'.1', [], 'contao_default');
-        $filename = sprintf(
+        $filename = \sprintf(
             '%s_%s_%s_%s',
             $type,
             $dateAdapter->parse('Ymd', $objService->invoiceDate),
             str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT),
-            $objCustomer->company
+            $objCustomer->company,
         );
 
         $options = [
@@ -108,13 +119,61 @@ class Generator
         $objSplFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
 
         if ('pdf' === $format) {
-            $objSplFile = $this->convertFile
+            $pdfInvoice = $this->convertFile
                 ->file($objSplFile->getRealPath())
                 ->convertTo('pdf')
             ;
+
+            $creditor = $this->buildCreditor($objService);
+            $deptor = $this->buildDeptor($objService);
+
+            $qrInvoice = $this->qrInvoiceGenerator->generate(
+                $creditor,
+                $deptor,
+                $objService->invoiceNumber,
+                (float) $objService->price,
+                $objService->currency,
+                'de',
+                $objService->title,
+            );
+
+            $fs = new Filesystem();
+            $fs->mkdir(Path::join($this->projectDir, '/system/tmp/qr_invoice'));
+
+            $outputPath = Path::join($this->projectDir, '/system/tmp/qr_invoice/', $pdfInvoice->getFilename());
+            $objSplFile = $this->pdfMerger->merge([$pdfInvoice->getRealPath(), $qrInvoice->getRealPath()], $outputPath);
         }
 
         throw new ResponseException($this->sendToBrowser($objSplFile));
+    }
+
+    protected function buildCreditor(CrmServiceModel $objService): Creditor
+    {
+        $company = CrmCompanyModel::findById($objService->company);
+
+        return new Creditor(
+            StringUtil::revertInputEncoding($company->company),
+            StringUtil::revertInputEncoding($company->street),
+            StringUtil::revertInputEncoding($company->streetNumber),
+            StringUtil::revertInputEncoding($company->postal),
+            StringUtil::revertInputEncoding($company->city),
+            StringUtil::revertInputEncoding($company->country),
+            StringUtil::revertInputEncoding($company->iban),
+        );
+    }
+
+    protected function buildDeptor(CrmServiceModel $objService): Deptor
+    {
+        $customer = CrmCustomerModel::findById($objService->toCustomer);
+
+        return new Deptor(
+            StringUtil::revertInputEncoding($customer->company),
+            StringUtil::revertInputEncoding($customer->street),
+            '',
+            StringUtil::revertInputEncoding($customer->postal),
+            StringUtil::revertInputEncoding($customer->city),
+            StringUtil::revertInputEncoding($customer->country),
+        );
     }
 
     protected function prepareString(string $string = ''): string
@@ -126,7 +185,7 @@ class Generator
         return htmlspecialchars(html_entity_decode($string));
     }
 
-    protected function sendToBrowser(\SplFileInfo|string $file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
+    protected function sendToBrowser(\SplFileInfo|string $file, string|null $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file);
         $response->setContentDisposition($disposition, $fileName ?? $response->getFile()->getFilename());

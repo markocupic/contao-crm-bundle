@@ -16,7 +16,7 @@ use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
 
-$GLOBALS['TL_DCA']['tl_crm_customer'] = [
+$GLOBALS['TL_DCA']['tl_crm_company'] = [
 	'config'      => [
 		'dataContainer'    => DC_Table::class,
 		'enableVersioning' => true,
@@ -30,11 +30,11 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 	'list'        => [
 		'sorting'           => [
 			'mode'        => DataContainer::MODE_SORTABLE,
-			'fields'      => ['dateAdded'],
+			'fields'      => ['company'],
 			'panelLayout' => 'filter;sort,search,limit',
 		],
 		'label'             => [
-			'fields'      => ['icon', 'firstname', 'lastname', 'username', 'dateAdded'],
+			'fields'      => ['icon', 'firstname', 'lastname', 'username'],
 			'showColumns' => true,
 		],
 		'global_operations' => [
@@ -56,7 +56,7 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 			'delete' => [
 				'href'       => 'act=delete',
 				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
+				'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"',
 			],
 			'toggle' => [
 				'href'    => 'act=toggle&amp;field=disable',
@@ -72,10 +72,10 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 	'palettes'    => [
 		'__selector__' => ['assignDir'],
 		'default'      => '
-        {personal_legend},firstname,lastname,gender;
-        {address_legend:hide},company,street,postal,city,state,country;
+        {personal_legend},company,firstname,lastname,gender;
+        {address_legend:hide},street,streetNumber,postal,city,state,country;
         {contact_legend},phone,mobile,fax,email,website;
-        {invoice_legend},ustId,invoiceAddress;
+        {invoice_legend},ustId,iban,invoiceAddress;
         {homedir_legend:hide},assignDir;
         {account_legend},disable
         ',
@@ -89,6 +89,16 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 		],
 		'tstamp'         => [
 			'sql' => "int(10) unsigned NOT NULL default '0'",
+		],
+		'company'        => [
+			'exclude'   => true,
+			'search'    => true,
+			'sorting'   => true,
+			'filter'    => true,
+			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
+			'inputType' => 'text',
+			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
+			'sql'       => "varchar(255) NOT NULL default ''",
 		],
 		'firstname'      => [
 			'exclude'   => true,
@@ -116,17 +126,14 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 			'eval'      => ['includeBlankOption' => true, 'tl_class' => 'w50'],
 			'sql'       => "varchar(32) NOT NULL default ''",
 		],
-		'company'        => [
+		'street'         => [
 			'exclude'   => true,
 			'search'    => true,
-			'sorting'   => true,
-			'filter'    => true,
-			'flag'      => DataContainer::SORT_INITIAL_LETTER_ASC,
 			'inputType' => 'text',
 			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
-		'street'         => [
+		'streetNumber'   => [
 			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'text',
@@ -207,18 +214,19 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
 			'sql'       => "varchar(255) NOT NULL default ''",
 		],
+		'iban'           => [
+			'exclude'   => true,
+			'search'    => true,
+			'inputType' => 'text',
+			'eval'      => ['maxlength' => 255, 'tl_class' => 'w50'],
+			'sql'       => "varchar(255) NOT NULL default ''",
+		],
 		'invoiceAddress' => [
 			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'textarea',
 			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
 			'sql'       => 'mediumtext NULL',
-		],
-		'assignDir'      => [
-			'exclude'   => true,
-			'inputType' => 'checkbox',
-			'eval'      => ['submitOnChange' => true],
-			'sql'       => "char(1) NOT NULL default ''",
 		],
 		'disable'        => [
 			'exclude'   => true,
@@ -228,14 +236,6 @@ $GLOBALS['TL_DCA']['tl_crm_customer'] = [
 			'inputType' => 'checkbox',
 			'eval'      => ['doNotCopy' => true],
 			'sql'       => "char(1) NOT NULL default ''",
-		],
-		'dateAdded'      => [
-			'default'   => time(),
-			'sorting'   => true,
-			'flag'      => DataContainer::SORT_DAY_DESC,
-			'inputType' => 'text',
-			'eval'      => ['rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard'],
-			'sql'       => "int(10) unsigned NOT NULL default '0'",
 		],
 	],
 ];

@@ -5,13 +5,14 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
  * @link https://github.com/markocupic/contao-crm-bundle
  */
 
+use Markocupic\ContaoCrmBundle\Model\CrmCompanyModel;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 
@@ -26,8 +27,13 @@ $GLOBALS['BE_MOD']['crm']['service'] = [
     'tables' => ['tl_crm_service'],
 ];
 
+$GLOBALS['BE_MOD']['crm']['company'] = [
+	'tables' => ['tl_crm_company'],
+];
+
 /*
  * Models
  */
+$GLOBALS['TL_MODELS']['tl_crm_company'] = CrmCompanyModel::class;
 $GLOBALS['TL_MODELS']['tl_crm_customer'] = CrmCustomerModel::class;
 $GLOBALS['TL_MODELS']['tl_crm_service'] = CrmServiceModel::class;

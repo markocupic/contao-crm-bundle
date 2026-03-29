@@ -22,10 +22,14 @@
     },
     "require": {
         "php": "^8.1",
+        "ext-bcmath": "*",
         "contao/core-bundle": "^5.1",
         "markocupic/phpoffice-bundle": "^1.0",
         "markocupic/cloudconvert-bundle": "^2.0",
-        "menatwork/contao-multicolumnwizard-bundle": "^3.6"
+        "menatwork/contao-multicolumnwizard-bundle": "^3.6",
+        "sprain/swiss-qr-bill": "^5.0",
+        "fpdf/fpdf": "^1.86",
+        "iio/libmergepdf": "^4.0"
     },
     "require-dev": {
         "contao/easy-coding-standard": "^5.0"

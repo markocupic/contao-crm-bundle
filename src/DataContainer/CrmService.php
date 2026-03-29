@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -30,6 +30,7 @@ use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 class CrmService
 {
     private Generator $generator;
+
     private string $cloudConvertApiKey;
 
     public function __construct(Generator $generator, string $cloudConvertApiKey)
@@ -49,7 +50,7 @@ class CrmService
         if ('generateInvoice' === Input::get('action') && Input::get('id') && Input::get('type')) {
             $type = Input::get('type');
 
-            if (null !== ($objInvoice = CrmServiceModel::findByPk(Input::get('id')))) {
+            if (null !== ($objInvoice = CrmServiceModel::findById(Input::get('id')))) {
                 $this->generator->generateInvoice($objInvoice, $type);
             }
         }
@@ -113,13 +114,13 @@ class CrmService
             }
         }
 
-        return sprintf(
+        return \sprintf(
             $strService,
             $class,
             $titleAttr,
             // Row 1
-            $arrRow['toCustomer'] ? CrmCustomerModel::findByPk($arrRow['toCustomer'])->company : '---',
-            $arrRow['toCustomer'] ? CrmCustomerModel::findByPk($arrRow['toCustomer'])->id : '---',
+            $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->company : '---',
+            $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->id : '---',
             // Row 2
             $arrRow['title'],
             // Row 3

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -44,7 +44,7 @@ class Docx
      *
      * @throws \Exception
      */
-    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): \SplFileObject
+    public function generate(CrmServiceModel $objService, CrmCustomerModel $objCustomer, string $templateSrc, string $destinationSrc): \SplFileInfo
     {
         /** @var System $systemAdapter */
         $systemAdapter = $this->framework->getAdapter(System::class);
@@ -93,7 +93,7 @@ class Docx
         $objSplFile = $templateProcessor->generate();
 
         if (file_exists($objSplFile->getRealPath())) {
-            return $objSplFile;
+            return new \SplFileInfo($objSplFile->getRealPath());
         }
 
         throw new \Exception('Failed generating Invoice from docx template.');

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -39,6 +39,7 @@ $GLOBALS['TL_LANG']['tl_crm_service']['service_legend'] = 'Leistung/Auftragsdeta
 /*
  * Fields
  */
+$GLOBALS['TL_LANG']['tl_crm_service']['company'] = ['Ausführende Firma', 'Geben Sie die ausführende Firma für diesen Auftrag ein.'];
 $GLOBALS['TL_LANG']['tl_crm_service']['title'] = ['Titel', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['projectDateStart'] = ['Projektstart', ''];
 $GLOBALS['TL_LANG']['tl_crm_service']['toCustomer'] = ['Kunde', ''];

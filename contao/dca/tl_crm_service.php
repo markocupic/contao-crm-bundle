@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of Contao CRM Bundle.
  *
- * (c) Marko Cupic 2024 <m.cupic@gmx.ch>
+ * (c) Marko Cupic <m.cupic@gmx.ch>
  * @license GPL-3.0-or-later
  * For the full copyright and license information,
  * please view the LICENSE file that was distributed with this source code.
@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'delete'              => [
 				'href'       => 'act=delete',
 				'icon'       => 'delete.gif',
-				'attributes' => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null).'\'))return false;Backend.getScrollOffset()"',
+				'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"',
 			],
 			'show'                => [
 				'href' => 'act=show',
@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 	'palettes'    => [
 		'__selector__' => ['paid'],
 		'default'      => '
-        {service_legend},title,projectDateStart,toCustomer,description,servicePositions;
+        {service_legend},company,title,projectDateStart,toCustomer,description,servicePositions;
         {invoice_legend},invoiceType,invoiceNumber,invoiceDate,price,currency,defaultInvoiceText,alternativeInvoiceText,crmInvoiceTpl;
         {state_legend},paid
         ',
@@ -92,6 +92,15 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 		],
 		'tstamp'                 => [
 			'sql' => "int(10) unsigned NOT NULL default '0'",
+		],
+		'company'                => [
+			'inputType'  => 'select',
+			'exclude'    => true,
+			'search'     => true,
+			'foreignKey' => 'tl_crm_company.company',
+			'relation'   => ['type' => 'belongsTo', 'load' => 'lazy'],
+			'eval'       => ['mandatory' => true, 'multiple' => false, 'maxlength' => 250, 'tl_class' => 'clr'],
+			'sql'        => "varchar(255) NOT NULL default ''",
 		],
 		'title'                  => [
 			'inputType' => 'text',
@@ -182,7 +191,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'options'   => InvoiceType::ALL,
 			'inputType' => 'select',
 			'eval'      => ['tl_class' => 'w50 wizard'],
-			'sql'       => "varchar(128) NOT NULL default '".InvoiceType::CALCULATION."'",
+			'sql'       => "varchar(128) NOT NULL default '" . InvoiceType::CALCULATION . "'",
 		],
 		'invoiceDate'            => [
 			'default'   => time(),
@@ -195,14 +204,14 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'exclude'   => true,
 			'search'    => true,
 			'inputType' => 'text',
-			'default'   => 'XXXX-'.date('m/Y'),
+			'default'   => 'XXXX-' . date('m/Y'),
 			'eval'      => ['unique' => true, 'tl_class' => 'clr'],
 			'sql'       => "varchar(128) NOT NULL default ''",
 		],
 		'defaultInvoiceText'     => [
 			'inputType' => 'textarea',
 			'exclude'   => true,
-			'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.'.chr(10).chr(10).'Mit besten Grüßen'.chr(10).chr(10).'Marko Cupic',
+			'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.' . chr(10) . chr(10) . 'Mit besten Grüßen' . chr(10) . chr(10) . 'Marko Cupic',
 			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
 			'sql'       => 'mediumtext NULL',
 		],

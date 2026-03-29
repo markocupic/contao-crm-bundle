@@ -11,4 +11,8 @@ services:
 
     Markocupic\ContaoCrmBundle\:
         resource: ../src/
-        exclude: ../src/{DependencyInjection,Resources,Model}
+        exclude: [
+            ../src/{DependencyInjection,Resources,Model},
+            ../src/**/Creditor.php,
+            ../src/**/Deptor.php
+        ]
