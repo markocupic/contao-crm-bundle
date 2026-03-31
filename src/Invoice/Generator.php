@@ -21,8 +21,8 @@ use Contao\Date;
 use Contao\FilesModel;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Validator;
 use Markocupic\CloudconvertBundle\Conversion\ConvertFile;
+use Markocupic\ContaoCrmBundle\Config\InvoiceType;
 use Markocupic\ContaoCrmBundle\Invoice\Docx\Docx;
 use Markocupic\ContaoCrmBundle\Model\CrmCompanyModel;
 use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
@@ -58,121 +58,97 @@ class Generator
      *
      * @throws \Exception
      */
-    public function generateInvoice(CrmServiceModel $objService, string $format = 'docx'): void
+    public function generateInvoice(CrmServiceModel $service, string $format = 'docx'): void
     {
-        /** @var CrmCustomerModel $crmCustomerModelAdapter */
-        $crmCustomerModelAdapter = $this->framework->getAdapter(CrmCustomerModel::class);
-
-        /** @var Validator $validatorAdapter */
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-
-        /** @var FilesModel $filesModelAdapter */
-        $filesModelAdapter = $this->framework->getAdapter(FilesModel::class);
-
-        /** @var Date $dateAdapter */
-        $dateAdapter = $this->framework->getAdapter(Date::class);
-
-        /** @var System $systemAdapter */
-        $systemAdapter = $this->framework->getAdapter(System::class);
-
-        // Load language
-        $systemAdapter->loadLanguageFile('tl_crm_service');
-
         // Get customer object
-        $objCustomer = $crmCustomerModelAdapter->findById($objService->toCustomer);
+        $customer = $this->framework->getAdapter(CrmCustomerModel::class)
+            ->findById($service->toCustomer)
+        ;
 
-        if (null === $objCustomer) {
-            throw new \Exception(\sprintf('Data record tl_crm_customer with ID %s is null.', $objService->toCustomer));
+        if (null === $customer) {
+            throw new \Exception(\sprintf('Data record tl_crm_customer with ID %s is null.', $service->toCustomer));
         }
 
         // Get the template path
-        if ('' !== $objService->crmInvoiceTpl || $validatorAdapter->isUuid($objService->crmInvoiceTpl)) {
-            $objTplFile = $filesModelAdapter->findByUuid($objService->crmInvoiceTpl);
-
-            if (null !== $objTplFile) {
-                $this->docxInvoiceTemplate = $objTplFile->path;
+        if (null !== ($docxTempl = $this->framework->getAdapter(FilesModel::class)->findByUuid($service->crmInvoiceTpl))) {
+            if (null !== $docxTempl) {
+                $this->docxInvoiceTemplate = $docxTempl->path;
             }
         }
 
-        // Generate filename
-        $type = $this->translator->trans('tl_crm_service.invoiceTypeReference.'.$objService->invoiceType.'.1', [], 'contao_default');
-        $filename = \sprintf(
-            '%s_%s_%s_%s',
-            $type,
-            $dateAdapter->parse('Ymd', $objService->invoiceDate),
-            str_pad((string) $objService->id, 7, '0', STR_PAD_LEFT),
-            $objCustomer->company,
-        );
+        $outputPath = $this->tempDir.'/'.$this->buildFileName($service, $customer);
 
-        $options = [
-            'locale' => 'en',
-            'validChars' => 'a-zA-Z0-9_-',
-            'delimiter' => '_',
-        ];
-
-        $filename = $this->slug->generate($filename, $options);
-
-        $filename = preg_replace('/[_]{2,}/', '_', $filename).'.docx';
-
-        $destinationSrc = $this->tempDir.'/'.$filename;
-
-        $objSplFile = $this->docx->generate($objService, $objCustomer, $this->docxInvoiceTemplate, $destinationSrc);
+        $file = $this->docx->generate($service, $customer, $this->docxInvoiceTemplate, $outputPath);
 
         if ('pdf' === $format) {
-            $pdfInvoice = $this->convertFile
-                ->file($objSplFile->getRealPath())
+            // Convert the docx- to a pdf-file
+            $file = $this->convertFile
+                ->file($file->getRealPath())
                 ->convertTo('pdf')
             ;
 
-            $creditor = $this->buildCreditor($objService);
-            $deptor = $this->buildDeptor($objService);
-
-            $qrInvoice = $this->qrInvoiceGenerator->generate(
-                $creditor,
-                $deptor,
-                $objService->invoiceNumber,
-                (float) $objService->price,
-                $objService->currency,
-                'de',
-                $objService->title,
-            );
-
-            $fs = new Filesystem();
-            $fs->mkdir(Path::join($this->projectDir, '/system/tmp/qr_invoice'));
-
-            $outputPath = Path::join($this->projectDir, '/system/tmp/qr_invoice/', $pdfInvoice->getFilename());
-            $objSplFile = $this->pdfMerger->merge([$pdfInvoice->getRealPath(), $qrInvoice->getRealPath()], $outputPath);
+            // Append the Swiss QR invoice
+            if (InvoiceType::INVOICE_DELIVERED === $service->invoiceType) {
+                $file = $this->appendSwissQrInvoice($file, $service);
+            }
         }
 
-        throw new ResponseException($this->sendToBrowser($objSplFile));
+        throw new ResponseException($this->sendToBrowser($file));
     }
 
-    protected function buildCreditor(CrmServiceModel $objService): Creditor
+    protected function appendSwissQrInvoice(\SplFileInfo $file, CrmServiceModel $service): \SplFileInfo
     {
-        $company = CrmCompanyModel::findById($objService->company);
+        $qrInvoiceFile = $this->qrInvoiceGenerator->generate(
+            $this->buildCreditor($service),
+            $this->buildDeptor($service),
+            $service->invoiceNumber,
+            (float) $service->price,
+            $service->currency,
+            'de',
+            $service->title,
+        );
+
+        $tempDir = Path::join($this->projectDir, '/system/tmp/qr_invoice');
+
+        if (!is_dir($tempDir)) {
+            (new Filesystem())->mkdir($tempDir);
+        }
+
+        $outputPath = Path::join($tempDir, $file->getFilename());
+
+        return $this->pdfMerger->merge([$file->getRealPath(), $qrInvoiceFile->getRealPath()], $outputPath);
+    }
+
+    protected function buildCreditor(CrmServiceModel $service): Creditor
+    {
+        $company = CrmCompanyModel::findById($service->company);
+
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
 
         return new Creditor(
-            StringUtil::revertInputEncoding($company->company),
-            StringUtil::revertInputEncoding($company->street),
-            StringUtil::revertInputEncoding($company->streetNumber),
-            StringUtil::revertInputEncoding($company->postal),
-            StringUtil::revertInputEncoding($company->city),
-            StringUtil::revertInputEncoding($company->country),
-            StringUtil::revertInputEncoding($company->iban),
+            $stringUtil->revertInputEncoding($company->company),
+            $stringUtil->revertInputEncoding($company->street),
+            $stringUtil->revertInputEncoding($company->streetNumber),
+            $stringUtil->revertInputEncoding($company->postal),
+            $stringUtil->revertInputEncoding($company->city),
+            $stringUtil->revertInputEncoding($company->country),
+            $stringUtil->revertInputEncoding($company->iban),
         );
     }
 
-    protected function buildDeptor(CrmServiceModel $objService): Deptor
+    protected function buildDeptor(CrmServiceModel $service): Deptor
     {
-        $customer = CrmCustomerModel::findById($objService->toCustomer);
+        $customer = CrmCustomerModel::findById($service->toCustomer);
+
+        $stringUtil = $this->framework->getAdapter(StringUtil::class);
 
         return new Deptor(
-            StringUtil::revertInputEncoding($customer->company),
-            StringUtil::revertInputEncoding($customer->street),
+            $stringUtil->revertInputEncoding($customer->company),
+            $stringUtil->revertInputEncoding($customer->street),
             '',
-            StringUtil::revertInputEncoding($customer->postal),
-            StringUtil::revertInputEncoding($customer->city),
-            StringUtil::revertInputEncoding($customer->country),
+            $stringUtil->revertInputEncoding($customer->postal),
+            $stringUtil->revertInputEncoding($customer->city),
+            $stringUtil->revertInputEncoding($customer->country),
         );
     }
 
@@ -183,6 +159,35 @@ class Generator
         }
 
         return htmlspecialchars(html_entity_decode($string));
+    }
+
+    protected function buildFileName(CrmServiceModel $service, CrmCustomerModel $customer): string
+    {
+        // Load language
+        $this->framework->getAdapter(System::class)
+            ->loadLanguageFile('tl_crm_service')
+        ;
+
+        // Generate the filename
+        $type = $this->translator->trans("tl_crm_service.invoiceTypeReference.$service->invoiceType.1", [], 'contao_default');
+
+        $fileName = \sprintf(
+            '%s_%s_%s_%s',
+            $type,
+            $this->framework->getAdapter(Date::class)->parse('Ymd', $service->invoiceDate),
+            str_pad((string) $service->id, 7, '0', STR_PAD_LEFT),
+            $customer->company,
+        );
+
+        $options = [
+            'locale' => 'en',
+            'validChars' => 'a-zA-Z0-9_-',
+            'delimiter' => '_',
+        ];
+
+        $fileName = $this->slug->generate($fileName, $options);
+
+        return preg_replace('/[_]{2,}/', '_', $fileName).'.docx';
     }
 
     protected function sendToBrowser(\SplFileInfo|string $file, string|null $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
