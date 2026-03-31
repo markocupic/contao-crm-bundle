@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Markocupic\ContaoCrmBundle\EventSubscriber;
 
 use Contao\CoreBundle\Routing\ScopeMatcher;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -23,6 +24,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         protected readonly ScopeMatcher $scopeMatcher,
+        protected readonly Packages $packages,
     ) {
     }
 
@@ -36,8 +38,7 @@ class KernelRequestSubscriber implements EventSubscriberInterface
         $request = $e->getRequest();
 
         if ($this->scopeMatcher->isBackendRequest($request)) {
-            $GLOBALS['TL_CSS'][] = 'bundles/markocupiccontaocrm/css/markocupic_crm_be.css|static';
-            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/markocupiccontaocrm/js/markocupic_crm_be.js|static';
+            $GLOBALS['TL_CSS'][] = $this->packages->getUrl('css/backend.css', 'markocupic_contao_crm');
         }
     }
 }

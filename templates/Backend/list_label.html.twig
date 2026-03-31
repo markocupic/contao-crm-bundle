@@ -1,0 +1,14 @@
+{% trans_default_domain 'contao_default' %}
+{% set attributes = attrs()
+    .addClass('tl_content_left')
+    .addClass(classes)
+    .set('title',title_attribute)
+%}
+<div{{ attributes }}>
+    <div class="list-service-row-1">{{ customer_company|raw }}/Kd-Nr: {{ customer_id }}</div>
+    <div class="list-service-row-2">{{ project.title|raw }}</div>
+    <div class="list-service-row-3">{{ 'MSC.invoiceNumber'|trans }}: {{ project.invoiceNumber }}</div>
+    <div class="list-service-row-4">{{ 'MSC.projectId'|trans }}: {{ project.id_padded }}</div>
+    <div class="list-service-row-5">{{ 'MSC.projectPrice'|trans }}: {{ project.price }} {{ project.currency }} ({{ price }} {{ project.currency }})</div>
+    <div class="list-service-row-6">{{ 'MSC.expense'|trans }}: {{ quantity }} {{ unit }}</div>
+</div>

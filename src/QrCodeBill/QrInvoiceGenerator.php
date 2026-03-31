@@ -93,7 +93,9 @@ readonly class QrInvoiceGenerator
         }
 
         if (\strlen($reference) > 21) {
-            throw new \InvalidArgumentException(\sprintf('Reference "%s" must not be longer than 21 characters.', $reference));
+            $err = \sprintf('Reference "%s" must not be longer than 21 characters.', $reference);
+
+            throw new \InvalidArgumentException($err);
         }
 
         // Step 1: Append "RF00" to the reference
@@ -129,7 +131,7 @@ readonly class QrInvoiceGenerator
                 $creditor->getFullname(),
                 $creditor->getStreet(),
                 $creditor->getStreetNumber(),
-                (string) $creditor->getPostal(),
+                $creditor->getPostal(),
                 $creditor->getCity(),
                 $creditor->getCountryCode(),
             ),
@@ -148,7 +150,7 @@ readonly class QrInvoiceGenerator
                 $deptor->getFullname(),
                 $deptor->getStreet(),
                 $deptor->getStreetNumber(),
-                (string) $deptor->getPostal(),
+                $deptor->getPostal(),
                 $deptor->getCity(),
                 $deptor->getCountryCode(),
             ),

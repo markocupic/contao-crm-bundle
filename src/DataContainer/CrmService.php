@@ -26,17 +26,15 @@ use Markocupic\ContaoCrmBundle\Model\CrmCustomerModel;
 use Markocupic\ContaoCrmBundle\Model\CrmServiceModel;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
+use Twig\Environment;
 
-class CrmService
+readonly class CrmService
 {
-    private Generator $generator;
-
-    private string $cloudConvertApiKey;
-
-    public function __construct(Generator $generator, string $cloudConvertApiKey)
-    {
-        $this->generator = $generator;
-        $this->cloudConvertApiKey = $cloudConvertApiKey;
+    public function __construct(
+        private Generator $generator,
+        private Environment $twig,
+        private string $cloudConvertApiKey,
+    ) {
     }
 
     /**
@@ -69,23 +67,14 @@ class CrmService
     #[AsCallback(table: 'tl_crm_service', target: 'list.label.label', priority: 100)]
     public function listServices(array $arrRow): string
     {
-        $strService = '
-<div class="tl_content_left %s" title="%s">
-    <div class="list-service-row-1">%s/Kd-Nr: %s</div>
-    <div class="list-service-row-2">%s</div>
-    <div class="list-service-row-3">%s: %s</div>
-    <div class="list-service-row-4">%s: %s</div>
-    <div class="list-service-row-5">%s: %s %s (%s %s)</div>
-    <div class="list-service-row-6">%s: %s %s</div>
-</div>';
-        $class = '';
+        $classes = [];
 
         if (InvoiceType::INVOICE_DELIVERED === $arrRow['invoiceType']) {
-            $class = ' invoiceDelivered';
+            $classes[] = 'invoice-delivered';
         }
 
         if ($arrRow['paid']) {
-            $class = ' invoicePaid';
+            $classes[] = 'invoice-paid';
         }
 
         $key = empty($arrRow['invoiceType']) ? InvoiceType::CALCULATION : $arrRow['invoiceType'];
@@ -114,31 +103,17 @@ class CrmService
             }
         }
 
-        return \sprintf(
-            $strService,
-            $class,
-            $titleAttr,
-            // Row 1
-            $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->company : '---',
-            $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->id : '---',
-            // Row 2
-            $arrRow['title'],
-            // Row 3
-            $GLOBALS['TL_LANG']['MSC']['invoiceNumber'],
-            $arrRow['invoiceNumber'],
-            // Row 4
-            $GLOBALS['TL_LANG']['MSC']['projectId'],
-            str_pad((string) $arrRow['id'], 7, '0', STR_PAD_LEFT),
-            // Row 5
-            $GLOBALS['TL_LANG']['MSC']['projectPrice'],
-            $arrRow['price'],
-            $arrRow['currency'],
-            $price,
-            $arrRow['currency'],
-            // Row 6
-            $GLOBALS['TL_LANG']['MSC']['expense'],
-            $quantity,
-            $unit,
-        );
+        $arrRow['id_padded'] = str_pad((string) $arrRow['id'], 7, '0', STR_PAD_LEFT);
+
+        return $this->twig->render('@MarkocupicContaoCrm/Backend/list_label.html.twig', [
+            'classes' => $classes,
+            'title_attribute' => $titleAttr,
+            'project' => $arrRow,
+            'customer_company' => $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->company : '---',
+            'customer_id' => $arrRow['toCustomer'] ? CrmCustomerModel::findById($arrRow['toCustomer'])->id : '---',
+            'unit' => $unit,
+            'quantity' => $quantity,
+            'price' => $price,
+        ]);
     }
 }

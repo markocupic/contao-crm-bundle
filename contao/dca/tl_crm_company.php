@@ -45,28 +45,7 @@ $GLOBALS['TL_DCA']['tl_crm_company'] = [
 			],
 		],
 		'operations'        => [
-			'edit'   => [
-				'href' => 'act=edit',
-				'icon' => 'edit.gif',
-			],
-			'copy'   => [
-				'href' => 'act=copy',
-				'icon' => 'copy.svg',
-			],
-			'delete' => [
-				'href'       => 'act=delete',
-				'icon'       => 'delete.svg',
-				'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"',
-			],
-			'toggle' => [
-				'href'    => 'act=toggle&amp;field=disable',
-				'icon'    => 'visible.svg',
-				'reverse' => true,
-			],
-			'show'   => [
-				'href' => 'act=show',
-				'icon' => 'show.svg',
-			],
+			'all',
 		],
 	],
 	'palettes'    => [

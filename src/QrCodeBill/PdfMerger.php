@@ -26,7 +26,9 @@ class PdfMerger
             $merger->addFile($file);
         }
 
-        file_put_contents($targetPath, $merger->merge());
+        if (false === file_put_contents($targetPath, $merger->merge())) {
+            throw new \Exception('Failed merging PDFs.');
+        }
 
         return new \SplFileInfo($targetPath);
     }

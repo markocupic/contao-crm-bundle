@@ -1,0 +1,35 @@
+{
+    "name": "contao-crm-bundle",
+    "repository": {
+        "type": "git",
+        "url": "git+github.com/markocupic/contao-crm-bundle"
+    },
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/preset-env": "^7.0.0",
+        "@symfony/webpack-encore": "^5.3.1",
+        "autoprefixer": "^10.4.27",
+        "core-js": "^3.19.3",
+        "css-loader": "^7.1.2",
+        "file-loader": "^6.0",
+        "postcss-loader": "^8.1.1",
+        "style-loader": "^4.0.0"
+    },
+    "browserslist": [
+        "defaults"
+    ],
+    "description": "![Alt text](docs/logo.png?raw=true \"logo\")",
+    "version": "1.0.0",
+    "main": "postcss.config.js",
+    "directories": {
+        "doc": "docs",
+        "test": "tests"
+    },
+    "author": "Marko Cupic"
+}
