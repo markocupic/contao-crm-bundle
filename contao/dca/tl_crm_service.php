@@ -112,7 +112,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'inputType' => 'textarea',
 			'exclude'   => true,
 			'search'    => true,
-			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
+			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
 			'sql'       => 'mediumtext NULL',
 		],
 		'servicePositions'       => [
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 						'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_item'],
 						'exclude'   => true,
 						'inputType' => 'textarea',
-						'eval'      => ['rte' => false, 'style' => 'width:95%;'],
+						'eval'      => ['style' => 'width:95%;'],
 					],
 					'quantity' => [
 						'label'     => &$GLOBALS['TL_LANG']['tl_crm_service']['position_quantity'],
@@ -193,14 +193,14 @@ $GLOBALS['TL_DCA']['tl_crm_service'] = [
 			'inputType' => 'textarea',
 			'exclude'   => true,
 			'default'   => 'Vielen Dank für Ihren sehr geschätzten Auftrag. Für Rückfragen stehe ich Ihnen gerne zur Verfügung.' . chr(10) . chr(10) . 'Mit besten Grüßen' . chr(10) . chr(10) . 'Marko Cupic',
-			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
+			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
 			'sql'       => 'mediumtext NULL',
 		],
 		'alternativeInvoiceText' => [
 			'inputType' => 'textarea',
 			'exclude'   => true,
 			'search'    => true,
-			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr', 'rte' => false],
+			'eval'      => ['decodeEntities' => false, 'tl_class' => 'clr'],
 			'sql'       => 'mediumtext NULL',
 		],
 		'crmInvoiceTpl'          => [
